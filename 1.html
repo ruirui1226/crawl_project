@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="box_bg" style=" background-color:#fff;margin-top:15px; position: relative;">
+        <div class="ewb_location">
+            您现在所在位置：
+            <a href="/PortalQDManage/">首页</a>
+            &gt;<a href="/Tradeinfo-GGGSList/0-0-0">交易信息</a>
+            &gt;<a id="atitle" href="/Tradeinfo-GGGSList/0-0-8">
+工程建设-中标公告
+</a>
+            &gt;<span>交易信息详情</span>
+        </div>
+        <div class="new_img_hover" id="qklDiv" style="visibility:hidden">
+            <div class="new_img_hover">
+                <img src="/Content/images/flag.png">
+                <div class="new_img_content">
+                    <div>
+                        <h3><img src="/Content/images/success.png">    招标公告,区块链已存证</h3>
+                        <h4><b>•</b>存证时间：</h4>
+                        <p><label id="datatime"></label></p>
+                        <h4><b>•</b>存证哈希值：</h4>
+                        <p><label id="hx"></label></p>
+                        <h4><b>•</b>区块高度：</h4>
+                        <p><label id="gd"></label></p>
+                        <h4><b>•</b>通道名称：</h4>
+                        <p><label id="name"></label><br><br></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+
+
+
+    <link href="/Content/NewPortal/css/process.css" rel="stylesheet">
+<script type="text/javascript">
+    function divclick(a)
+    {
+        document.getElementById(a).click();
+    }
+
+
+    //开发票选择登录入口
+    function chooseLoginUrl()
+    {
+        layer.open({
+            type: 1 //Page层类型---ifrme
+                   , area: ['350px', '100px']
+                   , anim: 4 //0-6的动画形式，-1不开启
+                   , title: ''
+                   , shade: 0.6 //遮罩透明度
+            //, maxmin: false //允许全屏最小化
+                   , content: '<p style="margin:5px;">请选择登录入口</p>'
+                   , btn: ['投标人、招标人登录', '监督登录']
+            //, closeBtn: 0
+                   , yes: function (index, layero) {
+                       var url_jy = 'https://ggzy.qingdao.gov.cn/fr/Pages/Login/SSOLogin.aspx?appid=104&backurl=4';
+                       window.open(url_jy);
+                   }
+                   , btn2: function (index, layero) {
+                       var url_jd = 'https://ggzy.qingdao.gov.cn/fr/Pages/Login/SSOLogin.aspx?appid=104&backurl=3';
+                       window.open(url_jd);
+                   }
+        });
+    }
+</script>
+
+    <div>
+        <div class="process_box">
+            <ul class="process_ul">
+                    <!--1招标公告\文件-->
+                        <li class="process_list">
+                            <div class="cur" onclick="divclick('js5021')">1</div>
+                            <p>
+                                <a id="js5021" class="acur" href="/TradeDetals-ZtbShow/152876-5021-0-0-0/19d5a76b-a58b-41ed-9693-e5ab11306892">招标公告\文件</a>
+                            </p>
+                        </li>
+                    <!--1.1暂停-->
+                    <!--1.2暂停恢复-->
+                    <!--1.3终止-->
+                    <!--2资格审查-->
+                        <li class="process_list">
+                            <div class="cur" onclick="divclick('js5161')">2</div>
+                            <p>
+                                <a id="js5161" class="acur" href="/TradeDetals-ZtbShow/35220-5161-0-4-0/19d5a76b-a58b-41ed-9693-e5ab11306892?isZGHS=1">资格审查</a>
+                            </p>
+                        </li>
+                    <!--3预中标公示-->
+                        <li class="process_list">
+                            <div class="cur" onclick="divclick('js5070')">3</div>
+                            <p>
+                                <a id="js5070" class="acur" href="/TradeDetals-ZtbShow/131550-5070-0-2-0/6a3f8693-208c-43ab-a217-38e01c8ae8f1">预中标公示</a>
+                            </p>
+                        </li>
+                    <!--4中标公告-->
+                        <li class="process_list">
+                            <div class="finish">4</div>
+                            <p>
+                                <a class="ayes" href="javascript:void(0)">中标公告</a>
+                            </p>
+                        </li>
+                    <!--废标公告-->
+                        <li class="process_list" disable="">
+                            <div>5</div>
+                            <p class="aNo">废标公告</p>
+                        </li>
+                    <!--7开具发票-->
+                        <li class="process_list" disable="">
+                            <div>7</div>
+                            <p class="aNo">开具发票</p>
+                        </li>
+                    <!--6支付公开-->
+                        <li class="process_list" disable="">
+                            <div>6</div>
+                            <p class="aNo">支付公开</p>
+                        </li>
+                            </ul>
+        </div>
+        <div class="content-title2">
+            <table class="xm_lists" cellspacing="0" cellpadding="0" border="0" style="width: 100%;">
+                <tbody>
+                <tr>
+                        <td>
+                                <span>城阳区公路铁路路域环境综合整治工程全面提升阶段(惜福镇街道 )工程总承包二次招标1标段</span>
+                        </td>
+                        <td><span>2023-07-24</span></td>
+                </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+        </div>
+
+
+
+<style type="text/css">
+
+    #htmlTable table {
+        margin: 0 auto;
+    }
+    .article_content {
+        width: 860px;
+        margin: 0 auto 6px;
+        border: 1px solid #ccc;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    .article_p {
+        height: 40px;
+        line-height: 40px;
+        font-weight: bold;
+        font-size: 18px;
+        border-bottom: 1px solid #ddd;
+        padding: 0 10px;
+        color: #2985da;
+    }
+
+    .article_list {
+        overflow: hidden;
+        width: 860px;
+        margin: 0 auto;
+        padding-bottom: 4px;
+    }
+
+    .article_list > li {
+        position: relative;
+        line-height: 40px;
+        clear: both;
+        color: #6f6f6f;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding-left: 20px;
+        border-bottom: 1px dashed #ccc;
+        font-size: 14px;
+    }
+
+    .article_list > li > span {
+        float: right;
+    }
+
+    .article_list .people_li span {
+        float: left;
+        display: inline-block;
+    }
+    .article_list > li > label {
+        white-space: pre-wrap !important;
+    }
+
+    .article_list .people_li label {
+        float: left;
+        padding-right: 3px;
+        display: inline-block;
+    }
+
+    .wd100 {
+        width: 100%;
+        text-align: left;
+        padding-left: 4px;
+    }
+
+    .click_pop {
+        padding: 0 10px;
+        background: #0071d8;
+        color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+        border-radius: 5px;
+        margin-right: 10px;
+        display: inline-block;
+        height: 30px;
+        line-height: 30px;
+    }
+
+    .click_pop:hover {
+        padding: 0 10px;
+        background: #0081d8;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .Disable {
+        padding: 0 10px;
+        background: #ccc !important;
+        color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+        border-radius: 5px;
+        margin-right: 10px;
+        display: inline-block;
+        height: 30px;
+        line-height: 30px;
+        cursor: pointer;
+    }
+
+    .query {
+        background-color: #dedede;
+    }
+
+    .tab {
+        border-collapse: collapse;
+        font-size: 14px;
+        color: #333;
+        margin: 0 auto 6px;
+        /*width: 860px;*/
+    }
+
+    .tab th {
+        border: 1px #ccc solid;
+        padding: 5px;
+        /*background-color: #dedede;*/
+        text-align: center;
+    }
+
+    .tab td {
+        border: 1px #ccc solid;
+        padding: 5px;
+    }
+
+    .tab td span {
+        font-size: 14px;
+    }
+
+
+
+</style>
+
+<!--崂山公告公示（老数据）-->
+
+
+<table border="0" cellpadding="0" cellspacing="0" width="950" style="margin:0 auto">
+    <!---预中标（中标）公告-->
+    <tr>
+        <td>
+            <div id="htmlTable">
+                 
+
+<title></title>
+<style type="text/css">
+			td{font-size:12px;font-family: "宋体"; border-collapse:collapse}
+			#maintable{border-top:solid 1px black;border-left:solid 1px black;}
+			#maintable td{border-right:solid 1px black;border-bottom:solid 1px black;}
+			.table_one{border-collapse:collapse; border:2px #acb1b7 solid; color:#333333}
+			.table_one td{border:1px #acb1b7 solid; padding:5px;}
+			.table_one td table td{ border:1px #fff solid}
+			.strg{ font-weight:bold;}
+			.table_two{border-collapse:collapse; color:#333333; border:2px #acb1b7 solid;  line-height:16px;}
+			.table_two td{ padding:5px;}
+			.bg{background-color:#e5f2f8; color:#094176}
+			.tle{width:100%; font-size:32px; line-height:40px; color:#cc0000; font-weight:bold; text-align:center; padding:20px 0px; margin:0 auto}
+			.red{ color:#F00}
+</style>
+
+
+
+
+<div class="tle">中标公告</div>
+
+<table width="860" border="0" cellspacing="0" cellpadding="0" class="table_one" align="center" style="font-size:12px;border-collapse:collapse;table-layout:auto;word-break: break-all; word-wrap: break-word;">
+
+  <tr>
+    <td width="18%" colspan="1" class="bg"><b>一、项目名称：</b></td>
+    <td colspan="3" class="nr_bg">城阳区公路铁路路域环境综合整治工程全面提升阶段(惜福镇街道 )工程总承包二次招标</td>
+  </tr>
+
+  <tr>
+	<td width="18%" class="bg"><b>二、标段编号：</b></td>
+	<td colspan="3" class="nr_bg">E3702002313015590001001</td>
+  </tr>
+
+  <tr>
+	<td width="18%" class="bg"><b>三、招标公告发布日期:</b></td>
+    <td colspan="3" class="nr_bg">2023-06-27</td>
+  </tr>
+
+  <tr>
+    <td width="18%" class="bg"><b>四、开标时间:</b></td>
+    <td colspan="3" class="nr_bg">2023-07-18 09:30</td>
+  </tr>
+
+  <tr>
+  	<td bold="1" colspan="4" class="bg"><b>五、中标情况：</b></td>
+    </tr>
+	<tr>
+  <td colspan="4" class="nr_bg"><script type="text/javascript"> function Toggle(id) { if (document.getElementById(id).style.display == 'none') { document.getElementById(id).style.display = 'block'; } else { document.getElementById(id).style.display = 'none';}}</script><div style="margin-top:10px;"><a style=" text-decoration:none" href="javascript:void(0)" id="show22" onclick="Toggle('divName22')"> <strong>中标情况表</strong></a></div><div id="divName22"><table class="divName22" align="center" cellpadding="0" cellspacing="0" style="border-collapse:collapse" width="100%">
+<tr><td align="center" style="border: 1px solid black;"><strong>序号</strong></td><td align="center" style="border: 1px solid black;"><strong>中标单位名称</strong></td><td align="center" style="border: 1px solid black;"><strong>项目负责人</strong></td><td align="center" style="border: 1px solid black;"><strong>中标金额（元/费率）</strong></td></tr>
+<tr><td style="border:  1px solid black;" colspan="1" rowspan="1">1</td><td style="border:  1px solid black;" colspan="1" rowspan="1">青岛振晟实业有限公司,山东龙跃兴设计集团有限公司</td><td style="border:  1px solid black;" colspan="1" rowspan="1">李红艳</td><td style="border:  1px solid black;" colspan="1" rowspan="1">49628103.50</td></tr>
+</table></div></td>
+   </tr>
+  	<tr>
+		<td width="18%" bold="1" colspan="1" class="bg"><b>六、评标委员会成员名单：</b></td>
+		<td width="32%" colspan="3" class="nr_bg">孙杰, 崔坤德, 赵焱焱, 孙辉, 邬红红</td>
+	</tr>
+
+
+  <tr>
+	<td colspan="1" width="18%" class="bg"><strong>七、代理机构：</strong></td>
+    <td colspan="3">青岛元顺工程咨询有限公司</td>
+  </tr>
+
+ <tr>
+    <td colspan="1" width="18%" class="bg"><strong>备注：</strong></td>
+    <td colspan="3"></td>
+  </tr>
+
+  <tr>
+    <td colspan="4" align="right" class="nr_bg">2023-07-24 11:10</td>
+  </tr>
+
+
+
+  </table>
+
+
+
+
+
+
+            </div>
+        </td>
+    </tr>
+
+        <!--政府采购招标文件下载gs-->
+        <!--中标公告变更集-->
+            <tr>
+                <td>
+                    <div>
+
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div>
+
+                    </div>
+                </td>
+            </tr>
+        <!---异议（预中标公示）-->
+        <!---质疑-->
+
+
+
+</table>
+
+
+<script type="text/javascript">
+
+    /*****************跳转登录************************/
+    function LoginTS() {
+        layer.alert("请登录后，再进行相关操作！", { icon: 0 }, function () {
+            window.location.href = "https://ggzy.qingdao.gov.cn/fr/Pages/Login/SSOLogin.aspx?appid=104&backurl=11";
+        });
+    }
+    /*****************异议************************/
+
+    function btn_AddYY(a, b, c, d, e) {
+
+        if (b <= 0) {
+            LoginTS();
+            return false;
+        }
+        if (e <= 0) {
+            layer.alert("只有参与投标的企业可以提出异议！", { icon: 0 });
+            return false;
+        }
+        $.ligerDialog.open({
+            title: '添加异议',
+            width: 800, height: 600,
+            url: '/PortalQDManage/PortalComplaint/SaveYYCurrency?id=' + a + '&classID=' + c + '&Noys=' + d,
+            showMax: false,
+            isResize: true
+        });
+
+
+    }
+
+    function YYTS(a) {
+        if (a > 0) {
+            layer.alert("已过异议时间！", { icon: 0 });
+        }
+        else {
+            layer.alert("未到异议时间！", { icon: 0 });
+        }
+    }
+    /*****************变更************************/
+    function btn_ZBBG(a) {
+
+        layer.open({
+            type: 2,
+            title: '中标公告变更详情',
+            id: "zbbg",
+            skin: 'layui-layer-demo',
+
+            area: ['800px', '532px'],
+            content: '/PortalQDManage/PortalComplaint/ZBBGDetails?keyGuid=' + a
+        });
+    }
+    /*****************质疑************************/
+
+    function QueryZB(a, b, c, d) {
+        if (b <= 0) {
+            LoginTS();
+            return false;
+        }
+        if (c <= 0) {
+            layer.alert("非此项目的投标单位，无操作权限！", { icon: 0 });
+            return false;
+        }
+        $.ligerDialog.open({
+            title: ' 添加质疑 ',
+
+            width: 800, height: 583,
+            url: '/PortalQDManage/PortalComplaint/QuerySaveZB?' + "pGuid=" + a + "&sGuid=" + d,
+            showMax: false,
+            isResize: true
+        });
+    }
+    function QueryTS(a) {
+        if (a > 0) {
+            layer.alert("已过质疑时间！", { icon: 0 });
+        }
+        else {
+            layer.alert("未到质疑时间！", { icon: 0 });
+        }
+    }
+
+    /*****************投诉************************/
+    function btn_AddTS(a, b) {
+
+        if (b <= 0) {
+            layer.alert("请用CA证书登录后，再进行相关操作！", { icon: 0 }, function () {
+                window.location.href = "https://ggzy.qingdao.gov.cn/fr/Pages/Login/SSOLogin.aspx?appid=104&backurl=4";
+            });
+            return false;
+        }
+        window.location.href = "https://ggzy.qingdao.gov.cn/jy/HomeJS";
+    }
+
+    //下载附件
+    function FileDownload(a, FileName) {
+        //var a = $("#FileId" + iid).val();
+        //var FileName = $("#FileName" + iid).html()
+        if (!a || a == "") {
+            return;
+        }
+        var index;
+        index = layer.load(2, { shade: [0.1, '#fff'] });
+        //});
+        //if (queryJson.length == 0) {
+        //    GetqueryJson();
+        //}
+        //queryJson["ExcelTitle"] = "中标情况明细表";
+        var downLoad = '/PortalQDManage/PortalQD/GetJYZLDownLoad?id=' + a;
+
+        var xhr = null;
+        if (window.XMLHttpRequest) {//Mozilla 浏览器
+            xhr = new XMLHttpRequest();
+        } else {
+            if (window.ActiveXObject) {//IE 浏览器
+                try {
+                    xhr = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+                catch (e) {
+                    try {//IE 浏览器
+                        xhr = new ActiveXObject("Msxml2.XMLHTTP");
+                    }
+                    catch (e) {
+                    }
+                }
+            }
+        }
+        xhr.open("POST", downLoad, true);
+        xhr.responseType = "blob";
+        xhr.setRequestHeader("Authorization", sessionStorage.getItem('cookieKey'));
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.onload = function (oEvent) {
+            if (this.status == 200) {
+                if (this.getResponseHeader("content-disposition")) {
+                    //var FileName = this.getResponseHeader("content-disposition").split(";")[1].split("filename=")[1].replace("\"", "").replace("\"", "");
+
+                    var blob = this.response;// this.response也就是请求的返回就是Blob对象
+                    var a = document.createElement('a');
+                    //一个字符串，表明该Blob对象所包含数据的MIME类型
+                    // blob.type = "application/excel";
+                    var url = URL.createObjectURL(blob);
+                    a.href = url;
+                    $("body").append(a);
+                    a.download = FileName;
+                    if (!!window.ActiveXObject || "ActiveXObject" in window) {
+                        window.navigator.msSaveOrOpenBlob(blob, FileName)
+                    } else {
+                        a.click()
+                    }
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    var fr = new FileReader();
+                    //fr.onload = function (e) {
+                    //    alert(e.target.result);
+                    //}
+                    fr.readAsText(this.response);
+                    var msg = JSON.parse(fr.result);
+                    if (msg) {
+                        layer.alert(msg.message, { icon: -1 });
+                        //dialogMsg(msg.message, -1);
+                    } else {
+                        layer.alert("下载失败！", { icon: -1 });
+                        //dialogMsg("下载失败！", -1);
+                    }
+                }
+
+            } else {
+                layer.alert("访问错误！", { icon: -1 });
+                // dialogMsg("访问错误", -1);
+            }
+            layer.close(index);
+        };
+        xhr.send();
+
+        return false;
+    }
+ $(function () {
+        if ("0" == "1" && "" == "101") {
+            $("#atitle").html($("#atitle").html().replace('政府采购', '国企采购'));
+        }
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+    </div>
+</body>
+</html>
