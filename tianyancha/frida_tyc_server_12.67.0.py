@@ -54,8 +54,8 @@ function getBytes(s) {
 }
 """
 
-str_host = "192.168.191.3:8787"
-# str_host = "10.69.6.14:8787"
+# str_host = "192.168.191.4:8787"
+str_host = "10.69.6.14:8787"
 # str_host = "172.16.0.185:877"
 manager = frida.get_device_manager()
 remote_device = manager.add_remote_device(str_host)

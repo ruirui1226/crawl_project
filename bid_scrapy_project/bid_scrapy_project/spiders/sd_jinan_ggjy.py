@@ -164,5 +164,5 @@ class SdJiNanGgjySpider(scrapy.Spider):
             item["website_name"] = "济南公共资源交易中心"
             item["website_url"] = "http://jnggzy.jinan.gov.cn/"
 
-        # yield item
-        print(item)
+        yield item
+        # print(item)

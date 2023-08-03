@@ -15,6 +15,7 @@ import time
 import math
 from tianyancha.untils.pysql import *
 from tianyancha.conf.env import *
+
 # from untils.redis_conn import conn
 # from untils.urls import ADMINISTRATIVE_LICENSING
 import uuid
@@ -23,6 +24,8 @@ import uuid
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from tianyancha.untils.urls import ADMINISTRATIVE_LICENSING, ADMINISTRATIVE_LICENSING_DETAIL
+
+from untils.sql_data import TYC_DATA
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -152,12 +155,12 @@ def main():
                 # mq.insert_into_administrative_licensing_detail(item)
                 mq.insert_sql("t_zx_tyc_administrative_licensing_detail", item)
                 # print(f"======插入===={item}====")
-            mq.close()
         except Exception as e:
             logger.debug(e)
         else:
             pass
         # delete_to_mysql_wechat_main(info_id,company_name)
+    mq.close()
 
 
 if __name__ == "__main__":

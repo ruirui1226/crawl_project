@@ -24,6 +24,8 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from untils.urls import HISTORY_EQUITY_PLEDGE
 
+from untils.sql_data import TYC_DATA
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -165,7 +167,7 @@ def get_history_equity_pledge_info(info_id, company_name, tyc_id, pageNum):
         res = requests.get(url=url, headers=headers, verify=False).text
         # logger.debug(res)
         res_json = json.loads(res)
-        create_json(pageNum, info_id, tyc_id, company_name, res_json)
+        # create_json(pageNum, info_id, tyc_id, company_name, res_json)
         items_list = res_json["data"]["items"]
         items = []
 
@@ -216,12 +218,12 @@ def get_history_equity_pledge_info(info_id, company_name, tyc_id, pageNum):
 
 
 def main():
-    data_list = get_company_230420_name()
-    # data_list=get_company_wechat_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         initial_pageNum = 1
         logger.warning("当前企业名称为%s" % company_name)
         if conn.sismember("tyc_history_equity_pledge", tyc_id):
@@ -241,17 +243,15 @@ def main():
             for pageNum in range(1, int(pages_total) + 1):
                 items = get_history_equity_pledge_info(info_id, company_name, tyc_id, pageNum)
                 try:
-                    mq = MysqlPipelinePublic()
                     for item in items:
                         mq.insert_sql("t_zx_history_equity_pledge", item)
-                    mq.close()
-
                 except Exception as e:
                     logger.debug(e)
         else:
             pass
         conn.sadd("tyc_history_equity_pledge", tyc_id)
         # delete_to_mysql_wechat_main(info_id,company_name)
+    mq.close()
 
 
 if __name__ == "__main__":

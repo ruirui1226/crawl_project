@@ -4,7 +4,7 @@
 @Time : 2023/7/12 15:11
 @Author : zhangpf
 @File : huizhaobiao.py
-@Desc : 惠招标
+@Desc : 惠招标-请求限制
 @Software: PyCharm
 """
 import json
@@ -52,7 +52,7 @@ class huizhaobiaoSpider(scrapy.Spider):
     #     # "zhongbiaogg",
     # ]
 
-    custom_settings = {"CONCURRENT_REQUESTS": 1, "DOWNLOAD_DELAY": 1}
+    custom_settings = {"CONCURRENT_REQUESTS": 1, "DOWNLOAD_DELAY": 3}
 
     def start_requests(self):
         for code in self.url_code_list:
@@ -93,7 +93,7 @@ class huizhaobiaoSpider(scrapy.Spider):
                 url=detail_url,
                 callback=self.detail_page,
                 headers=self.headers,
-                cb_kwargs={"detail_url": detail_url, "code": kwargs["code"], "url": url,"leixing":leixing},
+                cb_kwargs={"detail_url": detail_url, "code": kwargs["code"], "url": url, "leixing": leixing},
             )
 
     def detail_page(self, response, **kwargs):
@@ -129,7 +129,7 @@ class huizhaobiaoSpider(scrapy.Spider):
             item["bid_orgin_url"] = kwargs["detail_url"]
             item["po_json_data"] = response.text
             # print(item)
-            yield item
+            # yield item
         else:
             item = BidScrapyProjectItem()
             item["bid_id"] = get_md5(kwargs["url"])
@@ -149,4 +149,4 @@ class huizhaobiaoSpider(scrapy.Spider):
             item["bid_orgin_url"] = kwargs["detail_url"]
             item["bid_json_data"] = response.text
             # print(item)
-            yield item
+            # yield item

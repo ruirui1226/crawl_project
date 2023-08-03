@@ -18,8 +18,10 @@ from conf.env import *
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-from untils.pysql import get_company_230420_name, MysqlPipeline
+from untils.pysql import *
 from untils.redis_conn import conn
+
+from untils.sql_data import TYC_DATA
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -97,7 +99,7 @@ def get_importAndExport_info(info_id, company_name, tyc_id, tyc_hi, Authorizatio
                     "company_name": company_name,
                     "create_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(time.time()))),
                     "tyc_id": tyc_id,
-                    "creditLevel": importAndExport_base_info.get("creditLevel", "")
+                    "creditLevel": importAndExport_base_info.get("creditLevel", ""),
                 }
             else:
                 importAndExport_base_item = None
@@ -157,11 +159,12 @@ def get_importAndExport_info(info_id, company_name, tyc_id, tyc_hi, Authorizatio
 
 
 def main():
-    data_list = get_company_230420_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         pageNum = 1
         ex = conn.sadd("importandexport_id", tyc_id)
         if ex == 1:
@@ -172,31 +175,31 @@ def main():
             duid = data["data"]["duid"]
             deviceID = data["data"]["deviceID"]
             x_auth_token = data["data"]["x_auth_token"]
-            all_data = get_importAndExport_info(info_id, company_name, tyc_id, tyc_hi, Authorization, duid, deviceID, x_auth_token)
+            all_data = get_importAndExport_info(
+                info_id, company_name, tyc_id, tyc_hi, Authorization, duid, deviceID, x_auth_token
+            )
             if all_data:
                 base_info = all_data.get("base_info", "")
                 creditRating_items = all_data.get("creditRating_items", "")
                 sanction_items = all_data.get("sanction_items", "")
                 try:
-                    mq = MysqlPipeline()
-                    if base_info:
-                        mq.insert_into_importAndExport_base_info(base_info)
-                        logger.info("数据 %s 插入成功" % base_info)
-                    if creditRating_items:
-                        for creditRating_item in creditRating_items:
-                            mq.insert_into_importAndExport_creditRating_info(creditRating_item)
-                            logger.info("数据%s 插入成功" % creditRating_item)
-                    if sanction_items:
-                        for sanction_item in sanction_items:
-                            mq.insert_into_importAndExport_sanction_info(sanction_item)
-                            logger.info("数据%s 插入成功" % sanction_item)
-                    mq.close()
+                    mq.insert_sql("t_zx_company_importAndExport_base_info", base_info)
+                    logger.info("数据 %s 插入成功" % base_info)
+
+                    for creditRating_item in creditRating_items:
+                        mq.insert_sql("t_zx_company_importAndExport_creditRating_info", creditRating_item)
+                        logger.info("数据%s 插入成功" % creditRating_item)
+
+                    for sanction_item in sanction_items:
+                        mq.insert_sql("t_zx_company_importAndExport_sanction_info", sanction_item)
+                        logger.info("数据%s 插入成功" % sanction_item)
                 except Exception as e:
                     logger.debug(e)
             else:
                 pass
         else:
             logger.debug("%s---------数据已经采集，无需再次采集" % tyc_id)
+    mq.close()
 
 
 if __name__ == "__main__":

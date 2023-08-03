@@ -13,10 +13,12 @@ import uuid
 from tianyancha.conf.env import *
 from tianyancha.untils.pysql import *
 from untils.redis_conn import conn
+
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from tianyancha.untils.urls import COMPANY_HOLDING
+from untils.sql_data import TYC_DATA
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -175,11 +177,12 @@ def get_companyholding_info(info_id, company_name, tyc_id, pageNum):
 
 
 def main():
-    data_list = get_company_230420_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         pageNum = 1
 
         if conn.sismember("tyc_company_holding", tyc_id):
@@ -203,17 +206,15 @@ def main():
             for pageNum in range(1, int(pages_total) + 1):
                 items = get_companyholding_info(info_id, company_name, tyc_id, pageNum)
                 try:
-                    mq = MysqlPipelinePublic()
                     for item in items:
                         mq.insert_sql("t_zx_company_holding_info", item)
                         logger.info("数据 %s 插入成功" % item)
-                    mq.close()
-
                 except Exception as e:
                     logger.debug(e)
             # else:
             pass
         conn.sadd("tyc_company_holding", tyc_id)
+    mq.close()
 
 
 if __name__ == "__main__":

@@ -24,7 +24,9 @@ try:
 except:
     from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+    from untils.sql_data import TYC_DATA
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 def create_json(info_id, tyc_id, company_name, res_json):
@@ -186,11 +188,12 @@ def get_tzanli_info(info_id, company_name, tyc_id, pageNum):
 
 
 def main():
-    data_list = get_company_230329_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         pageNum = 1
         logger.warning("当前企业名称为%s" % company_name)
         if conn.sismember("tyc_get_tzanli_info", tyc_id):
@@ -214,7 +217,6 @@ def main():
             x_auth_token,
         )
         if pages_total:
-            mq = MysqlPipelinePublic()
             for pageNum in range(1, int(pages_total) + 1):
                 items = get_tzanli_info(info_id, company_name, tyc_id, pageNum)
                 if items:
@@ -224,10 +226,10 @@ def main():
                         mq.insert_sql("t_zx_company_tzanli_info", item)
                         # except Exception as e:
                         #     logger.error(e)
-            mq.close()
         else:
             pass
         conn.sadd("tyc_get_tzanli_info", tyc_id)
+    mq.close()
 
 
 if __name__ == "__main__":

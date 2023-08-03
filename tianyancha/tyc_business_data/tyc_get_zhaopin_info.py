@@ -19,6 +19,8 @@ from untils.redis_conn import conn
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+from untils.sql_data import TYC_DATA
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -79,7 +81,7 @@ def get_Zhaopin_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid,
     }
     url = f"https://api6.tianyancha.com/cloud-business-state/recruitment/list?city=-100&pageSize=10&graphId={tyc_id}&experience=-100&pageNum=1&startDate=-100"
     res = requests.get(url, headers=headers, verify=False).text
-    logger.debug(res)
+    # logger.debug(res)
     res_json = json.loads(res)
     if res_json.get("state", "") == "error":
         logger.debug("%s当前数据异常" % company_name)
@@ -98,6 +100,8 @@ def get_Zhaopin_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid,
 
 def get_Zhaopin_info(pageNum, info_id, company_name, tyc_id):
     try:
+        url = f"https://api6.tianyancha.com/cloud-business-state/recruitment/list?city=-100&pageSize=10&graphId={tyc_id}&experience=-100&pageNum={pageNum}&startDate=-100"
+
         data = get_authoriaztion(info_id, company_name, tyc_id, pageNum)
         tyc_hi = data["data"]["tyc_hi"]
         Authorization = data["data"]["Authorization"]
@@ -131,57 +135,56 @@ def get_Zhaopin_info(pageNum, info_id, company_name, tyc_id):
             "Host": "api6.tianyancha.com",
             "Accept-Encoding": "gzip",
         }
+        res = requests.get(url, headers=headers, verify=False).text
 
-        url = f"https://api6.tianyancha.com/cloud-business-state/recruitment/list?city=-100&pageSize=10&graphId={tyc_id}&experience=-100&pageNum={pageNum}&startDate=-100"
+        logger.debug(res)
+        res_json = json.loads(res)
+        # create_json(pageNum, info_id, tyc_id, company_name, res_json)
+        items = []
+        for zhaopin_info in res_json["data"]["list"]:
+            item = {
+                "info_id": info_id,
+                "education": zhaopin_info.get("education", ""),
+                "city": zhaopin_info.get("city", ""),
+                "companyName": zhaopin_info.get("companyName", ""),
+                "webInfoPath": zhaopin_info.get("webInfoPath", ""),
+                "source": zhaopin_info.get("source", ""),
+                "title": zhaopin_info.get("title", ""),
+                "experience": zhaopin_info.get("experience", ""),
+                "salary": zhaopin_info.get("salary", ""),
+                "welfare": zhaopin_info.get("welfare", ""),
+                "isPromise": zhaopin_info.get("isPromise", ""),
+                "companyGid": zhaopin_info.get("companyGid", ""),
+                "welfareList": zhaopin_info.get("welfareList", ""),
+                "allDirect": zhaopin_info.get("allDirect", ""),
+                "startDate": zhaopin_info.get("startDate", ""),
+                "wapInfoPath": zhaopin_info.get("wapInfoPath", ""),
+                "company_name": company_name,
+                "create_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(time.time()))),
+                "tyc_id": tyc_id,
+                "url": url,
+            }
+            items.append(item)
 
-        ex = conn.sadd("zhaopin_url", url)
-        if ex == 1:
-            res = requests.get(url, headers=headers, verify=False).text
-
-            logger.debug(res)
-            res_json = json.loads(res)
-            create_json(pageNum, info_id, tyc_id, company_name, res_json)
-            items = []
-            for zhaopin_info in res_json["data"]["list"]:
-                item = {
-                    "info_id": info_id,
-                    "education": zhaopin_info.get("education", ""),
-                    "city": zhaopin_info.get("city", ""),
-                    "companyName": zhaopin_info.get("companyName", ""),
-                    "webInfoPath": zhaopin_info.get("webInfoPath", ""),
-                    "source": zhaopin_info.get("source", ""),
-                    "title": zhaopin_info.get("title", ""),
-                    "experience": zhaopin_info.get("experience", ""),
-                    "salary": zhaopin_info.get("salary", ""),
-                    "welfare": zhaopin_info.get("welfare", ""),
-                    "isPromise": zhaopin_info.get("isPromise", ""),
-                    "companyGid": zhaopin_info.get("companyGid", ""),
-                    "welfareList": zhaopin_info.get("welfareList", ""),
-                    "allDirect": zhaopin_info.get("allDirect", ""),
-                    "startDate": zhaopin_info.get("startDate", ""),
-                    "wapInfoPath": zhaopin_info.get("wapInfoPath", ""),
-                    "company_name": company_name,
-                    "create_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(time.time()))),
-                    "tyc_id": tyc_id,
-                    "url": url,
-                }
-                items.append(item)
-
-            return items
-        else:
-            logger.debug("%s---------数据已经采集，无需再次采集" % tyc_id)
+        return items
 
     except Exception as e:
         logger.debug(e)
 
 
 def main():
-    data_list = get_company_230420_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         pageNum = 1
+        ex = conn.sismember("t_zx_company_zhaopin_info", tyc_id)
+        if ex:
+            logger.debug("%s---------数据已经采集，无需再次采集" % tyc_id)
+            continue
+        logger.warning("当前企业名称为%s" % company_name)
         data = get_authoriaztion(info_id, company_name, tyc_id, pageNum)
         tyc_hi = data["data"]["tyc_hi"]
         Authorization = data["data"]["Authorization"]
@@ -197,16 +200,15 @@ def main():
                 items = get_Zhaopin_info(pageNum, info_id, company_name, tyc_id)
                 try:
                     pass
-                    mq = MysqlPipeline()
                     for item in items:
-                        mq.insert_into_zhaopin_info(item)
+                        mq.insert_sql("t_zx_company_zhaopin_info", item)
                         logger.info("数据 %s 插入成功" % item)
-                    mq.close()
-
                 except Exception as e:
                     logger.debug(e)
         else:
             pass
+        conn.sadd("t_zx_company_zhaopin_info", tyc_id)
+    mq.close()
 
 
 if __name__ == "__main__":

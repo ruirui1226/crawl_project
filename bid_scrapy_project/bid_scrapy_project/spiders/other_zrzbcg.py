@@ -12,7 +12,7 @@ import logging
 import re
 import time
 
-import pandas as pd
+# import pandas as pd
 import scrapy
 
 from bid_scrapy_project.common.common import get_md5
@@ -78,7 +78,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
             json_text = " ".join(text_string)
             detail_htlm = json.dumps(data_json, ensure_ascii=False)
             bid_public_time1 = response.meta['time']
-            bid_public_time = self.normalize_datetime(bid_public_time1)
+            bid_public_time = format_time(bid_public_time1)
             contentUrl = response.meta['list_url']
             bid_id = get_md5(contentUrl)
             item = GovernmentProcurementItem()
@@ -96,20 +96,20 @@ class GgzyjyNmgSpider(scrapy.Spider):
         except Exception as e:
             logging.debug(e)
 
-    def normalize_datetime(self, time_str):
-        try:
-            datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d %H:%M:%S")
-        except ValueError:
-            try:
-                datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d")
-            except ValueError:
-                try:
-                    datetime_obj = pd.to_datetime(time_str, format="%m/%d/%Y %I:%M %p")
-                except ValueError:
-                    return None
-
-        normalized_time_str = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
-        return normalized_time_str
+    # def normalize_datetime(self, time_str):
+    #     try:
+    #         datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d %H:%M:%S")
+    #     except ValueError:
+    #         try:
+    #             datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d")
+    #         except ValueError:
+    #             try:
+    #                 datetime_obj = pd.to_datetime(time_str, format="%m/%d/%Y %I:%M %p")
+    #             except ValueError:
+    #                 return None
+    #
+    #     normalized_time_str = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
+    #     return normalized_time_str
 
 
 class GetJsonTextSpider():

@@ -100,7 +100,7 @@ def get_enterprise_market_value_info(info_id, company_name, tyc_id, bondNum):
 
         # logger.debug(res)
         res_json = json.loads(res)
-        create_json(info_id, tyc_id, company_name, res_json)
+        # create_json(info_id, tyc_id, company_name, res_json)
         data = res_json["data"]
         items = []
         item = {

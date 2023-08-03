@@ -12,13 +12,15 @@ import time
 from datetime import datetime
 from io import StringIO
 
-import pandas as pd
+# import pandas as pd
 import requests
 import scrapy
 from lxml import etree
 
 from bid_scrapy_project.common.common import get_md5
 from bid_scrapy_project.items import BidScrapyProjectItem, GovernmentProcurementItem
+
+from bid_scrapy_project.common.common import format_time
 
 
 class GgzyjyNmgSpider(scrapy.Spider):
@@ -121,7 +123,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
                 if '</' not in detail_htlm:
                     title = list_item.get('bulletinTitle')
                     bid_public_time = list_item.get('bulletinStartTime')
-                    releaseDate = self.normalize_datetime(bid_public_time)
+                    releaseDate = format_time(bid_public_time)
                     url = 'https://www.hbggzyfwpt.cn/jyxx/zfcg/cgggDetail?guid=' + list_item.get('guid')
                     meta = {"url": url, "title": title, "releaseDate": releaseDate,
                             "one_title": response.meta['one_title'], "two_title": response.meta['two_title']}
@@ -131,7 +133,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
                     tree = etree.parse(StringIO(detail_htlm), etree.HTMLParser())
                     detail_text = ' '.join(tree.xpath('//text()')).strip()
                     bid_public_time = list_item.get('bulletinStartTime')
-                    po_public_time = self.normalize_datetime(bid_public_time)
+                    po_public_time = format_time(bid_public_time)
                     url = response.meta['details']
                     contentUrl = self.website_url + url + list_item.get('guid')
                     po_id = get_md5(contentUrl)
@@ -157,7 +159,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
                 if '</' not in detail_htlm:
                     title = list_item.get('terminationBulletinTitle')
                     bid_public_time = list_item.get('modificationStartTime')
-                    releaseDate = self.normalize_datetime(bid_public_time)
+                    releaseDate = format_time(bid_public_time)
                     url ='https://www.hbggzyfwpt.cn/jyxx/zfcg/gzsxDetail?guid=' + list_item.get('guid')
                     meta = {"url": url, "title": title, "releaseDate": releaseDate,
                             "one_title": response.meta['one_title'], "two_title": response.meta['two_title']}
@@ -167,7 +169,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
                     tree = etree.parse(StringIO(detail_htlm), etree.HTMLParser())
                     detail_text = ' '.join(tree.xpath('//text()')).strip()
                     bid_public_time = list_item.get('modificationStartTime')
-                    po_public_time = self.normalize_datetime(bid_public_time)
+                    po_public_time = format_time(bid_public_time)
                     url = response.meta['details']
                     contentUrl = self.website_url + url + list_item.get('guid')
                     po_id = get_md5(contentUrl)
@@ -193,7 +195,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
                 if '</' not in detail_htlm:
                     title = list_item.get('winBidBulletinTitle')
                     bid_public_time = list_item.get('winBidBulletinStartTime')
-                    releaseDate = self.normalize_datetime(bid_public_time)
+                    releaseDate = format_time(bid_public_time)
                     url ='https://www.hbggzyfwpt.cn/jyxx/zfcg/zbjggsDetail?guid=' + list_item.get('guid')
                     meta = {"url": url, "title": title, "releaseDate": releaseDate,
                             "one_title": response.meta['one_title'], "two_title": response.meta['two_title']}
@@ -203,7 +205,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
                     tree = etree.parse(StringIO(detail_htlm), etree.HTMLParser())
                     detail_text = ' '.join(tree.xpath('//text()')).strip()
                     bid_public_time = list_item.get('winBidBulletinStartTime')
-                    po_public_time = self.normalize_datetime(bid_public_time)
+                    po_public_time = format_time(bid_public_time)
                     url = response.meta['details']
                     contentUrl = self.website_url + url + list_item.get('guid')
                     po_id = get_md5(contentUrl)
@@ -227,7 +229,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
             for list_item in list_items:
                 title = list_item.get('contractName')
                 bid_public_time = list_item.get('signingTime')
-                releaseDate = self.normalize_datetime(bid_public_time)
+                releaseDate = format_time(bid_public_time)
                 url = list_item.get('url')
                 meta = {"url": url, "title": title, "releaseDate": releaseDate,
                         "one_title": response.meta['one_title'], "two_title": response.meta['two_title']}
@@ -244,7 +246,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
                     bulletinIssueTime = list_item.get('bulletinIssueTime')
                     datetime_obj = datetime.strptime(bulletinIssueTime, "%Y%m%d%H%M%S")
                     formatted_time = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
-                    po_public_time = self.normalize_datetime(formatted_time)
+                    po_public_time = format_time(formatted_time)
                     url ='https://www.hbggzyfwpt.cn/jyxx/jsgcZbggDetail?guid=' + list_item.get('tenderBulletinGuid')
                     meta = {"url": url, "title": title, "releaseDate": po_public_time,
                             "one_title": response.meta['one_title'], "two_title": response.meta['two_title']}
@@ -256,7 +258,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
                     bulletinIssueTime = list_item.get('bulletinIssueTime')
                     datetime_obj = datetime.strptime(bulletinIssueTime, "%Y%m%d%H%M%S")
                     formatted_time = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
-                    po_public_time = self.normalize_datetime(formatted_time)
+                    po_public_time = format_time(formatted_time)
                     bulletinName = list_item.get('bulletinName')
                     url = response.meta['details']
                     contentUrl = self.website_url + url + tenderBulletinGuid
@@ -283,7 +285,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
                 if '</' not in bulletinContent:
                     title = list_item.get('bulletinName')
                     bid_public_time = list_item.get('bulletinIssueTime')
-                    releaseDate = self.normalize_datetime(bid_public_time)
+                    releaseDate = format_time(bid_public_time)
                     url ='https://www.hbggzyfwpt.cn/jyxx/jsgcZbjggsDetail?guid=' + list_item.get('winBidBulletinGuid')
                     meta = {"url": url, "title": title, "releaseDate": releaseDate,
                             "one_title": response.meta['one_title'], "two_title": response.meta['two_title']}
@@ -293,7 +295,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
                     detail_text = ' '.join(tree.xpath('//text()')).strip()
                     winBidBulletinGuid = list_item.get('winBidBulletinGuid')
                     bulletinIssueTime = list_item.get('bulletinIssueTime')
-                    po_public_time = self.normalize_datetime(bulletinIssueTime)
+                    po_public_time = format_time(bulletinIssueTime)
                     bulletinName = list_item.get('bulletinName')
                     url = response.meta['details']
                     contentUrl = self.website_url + url + winBidBulletinGuid
@@ -320,7 +322,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
                 if '</' not in bulletinContent:
                     title = list_item.get('noticeName')
                     bid_public_time = list_item.get('bidOpeningTime')
-                    releaseDate = self.normalize_datetime(bid_public_time)
+                    releaseDate = format_time(bid_public_time)
                     url ='https://www.hbggzyfwpt.cn/jyxx/jsgcKbjlDetail?guid=' + list_item.get('guid')
                     meta = {"url": url, "title": title, "releaseDate": releaseDate,
                             "one_title": response.meta['one_title'], "two_title": response.meta['two_title']}
@@ -330,7 +332,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
                     detail_text = ' '.join(tree.xpath('//text()')).strip()
                     winBidBulletinGuid = list_item.get('guid')
                     bulletinIssueTime = list_item.get('bidOpeningTime')
-                    po_public_time = self.normalize_datetime(bulletinIssueTime)
+                    po_public_time = format_time(bulletinIssueTime)
                     bulletinName = list_item.get('noticeName')
                     url = response.meta['details']
                     contentUrl = self.website_url + url + winBidBulletinGuid
@@ -367,7 +369,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
                 if '</' not in bulletinContent:
                     title = list_item.get('publiCityName')
                     bid_public_time = list_item.get('publiCityReferTime')
-                    releaseDate = self.normalize_datetime(bid_public_time)
+                    releaseDate = format_time(bid_public_time)
                     url ='https://www.hbggzyfwpt.cn/jyxx/jsgcpbjggsDetail?guid=' + list_item.get('guid')
                     meta = {"url": url, "title": title, "releaseDate": releaseDate,
                             "one_title": response.meta['one_title'], "two_title": response.meta['two_title']}
@@ -377,7 +379,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
                     detail_text = ' '.join(tree.xpath('//text()')).strip()
                     winBidBulletinGuid = list_item.get('guid')
                     bulletinIssueTime = list_item.get('publiCityReferTime')
-                    po_public_time = self.normalize_datetime(bulletinIssueTime)
+                    po_public_time = format_time(bulletinIssueTime)
                     bulletinName = list_item.get('publiCityName')
                     url = response.meta['details']
                     contentUrl = self.website_url + url + winBidBulletinGuid
@@ -403,7 +405,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
         detail_htlm = response.xpath("//div[@class='ctn-detail']").get()
         detail_text = ' '.join(response.xpath('//div[@class="ctn-detail"]//text()').extract()).strip()
         bid_public_time = response.meta['releaseDate']
-        po_public_time = self.normalize_datetime(bid_public_time)
+        po_public_time = format_time(bid_public_time)
         contentUrl = response.meta['url']
         bid_id = get_md5(contentUrl)
         item = BidScrapyProjectItem()
@@ -424,7 +426,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
         detail_htlm = response.xpath("//div[@class='content clearfloat']").get()
         detail_text = ' '.join(response.xpath('//div[@class="content clearfloat"]//text()').extract()).strip()
         bid_public_time = response.meta['releaseDate']
-        po_public_time = self.normalize_datetime(bid_public_time)
+        po_public_time = format_time(bid_public_time)
         contentUrl = response.meta['url']
         po_id = get_md5(contentUrl)
         item = GovernmentProcurementItem()
@@ -442,17 +444,17 @@ class GgzyjyNmgSpider(scrapy.Spider):
         item['create_datetime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(time.time())))
         yield item
 
-    def normalize_datetime(self, time_str):
-        try:
-            datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d %H:%M:%S")
-        except ValueError:
-            try:
-                datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d")
-            except ValueError:
-                try:
-                    datetime_obj = pd.to_datetime(time_str, format="%m/%d/%Y %I:%M %p")
-                except ValueError:
-                    return None
-
-        normalized_time_str = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
-        return normalized_time_str
+    # def normalize_datetime(self, time_str):
+    #     try:
+    #         datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d %H:%M:%S")
+    #     except ValueError:
+    #         try:
+    #             datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d")
+    #         except ValueError:
+    #             try:
+    #                 datetime_obj = pd.to_datetime(time_str, format="%m/%d/%Y %I:%M %p")
+    #             except ValueError:
+    #                 return None
+    #
+    #     normalized_time_str = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
+    #     return normalized_time_str

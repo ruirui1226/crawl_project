@@ -23,6 +23,8 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from untils.urls import HISTORY_COURT_ANNOUNCEMENT_DETAILS
 
+from untils.sql_data import TYC_DATA
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -136,25 +138,23 @@ def get_court_announcement_details_info(info_id, company_name, tyc_id, uuid):
 
 
 def main():
-    # data_list = get_company_230420_name()
-    data_list = get_court_announcement_details_id()
+    mq = MysqlPipelinePublic()
+    data_list = mq.select_sql("t_zx_history_court_announcement", ["id", "company_name", "tyc_id", "uuid"], {"1": "1"})
     # data_list=get_company_wechat_name()
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
-        uuid = data[3]
+        info_id = data.get("id")
+        company_name = data.get("company_name")
+        tyc_id = data.get("tyc_id")
+        uuid = data.get("uuid")
 
         logger.warning("当前企业名称为-------%s" % company_name)
         items = get_court_announcement_details_info(info_id, company_name, tyc_id, uuid)
         try:
-            mq = MysqlPipeline()
             for item in items:
-                mq.insert_into_court_announcement_details_info(item)
-            mq.close()
-
+                mq.insert_sql("t_zx_history_court_announcement_details", item)
         except Exception as e:
             logger.debug(e)
+    mq.close()
 
 
 if __name__ == "__main__":

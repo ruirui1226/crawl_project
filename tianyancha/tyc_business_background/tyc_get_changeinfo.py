@@ -15,10 +15,12 @@ import math
 from tianyancha.conf.env import *
 from tianyancha.untils.pysql import *
 from untils.redis_conn import conn
+
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from tianyancha.untils.urls import CHANGE_INFO
+from untils.sql_data import TYC_DATA
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -45,7 +47,7 @@ def get_authoriaztion(info_id, company_name, tyc_id, pageNum):
     data = {"url": url, "version": version}
 
     r = requests.post("http://127.0.0.1:9966/get_authorzation", data=json.dumps(data))
-    print(r.text)
+    # print("pppppppp", r.text)
     data = json.loads(r.text)
     return data
 
@@ -81,13 +83,13 @@ def get_Change_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid, 
     }
 
     url = CHANGE_INFO.format(tyc_id, "1")
-    print(url)
+    print(company_name)
     res = requests.get(url=url, headers=headers, verify=False).text
 
     logger.debug(res)
     res_json = json.loads(res)
 
-    if int(res_json["data"]["total"]) > 0:
+    if "total" in res_json and res_json["data"]["total"] and int(res_json["data"]["total"]) > 0:
         pages_total = math.ceil(int(res_json["data"]["total"]) / 20)
         if pages_total:
             return pages_total
@@ -109,7 +111,7 @@ def get_Change_info(info_id, company_name, tyc_id, pageNum, x_auth_token):
         logger.warning(url)
 
         data = get_authoriaztion(info_id, company_name, tyc_id, pageNum)
-        print("=====123132", data)
+        # print("=====123132", data)
         tyc_hi = data["data"]["tyc_hi"]
         Authorization = data["data"]["Authorization"]
         duid = data["data"]["duid"]
@@ -148,10 +150,11 @@ def get_Change_info(info_id, company_name, tyc_id, pageNum, x_auth_token):
         logger.debug(res)
         res_json = json.loads(res)
 
-        create_json(company_name, res_json)
+        # create_json(company_name, res_json)
         items = []
         for changer_info in res_json["data"]["result"]:
             item = {
+                "tyc_id": tyc_id,
                 "info_id": info_id,
                 "changeTime": changer_info.get("changeTime", ""),
                 "havePsersion": changer_info.get("havePsersion", ""),
@@ -164,20 +167,18 @@ def get_Change_info(info_id, company_name, tyc_id, pageNum, x_auth_token):
                 "create_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(time.time()))),
             }
             items.append(item)
-
-        #
-
         return items
     except Exception as e:
         logger.debug(e)
 
 
 def main():
-    data_list = get_company_230420_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         pageNum = 1
         if conn.sismember("tyc_get_changeinfo", tyc_id):
             logger.debug("{}=======>数据已经采集，无需再次采集".format(tyc_id))
@@ -192,22 +193,20 @@ def main():
             info_id, company_name, tyc_id, tyc_hi, Authorization, duid, deviceID, X_AUTH_TOKEN
         )
         if pages_total:
-            print(company_name)
             for pageNum in range(1, int(pages_total) + 1):
                 # get_publicWechat_info(info_id, company_name, tyc_id, pageNum)
                 items = get_Change_info(info_id, company_name, tyc_id, pageNum, X_AUTH_TOKEN)
                 try:
-                    mq = MysqlPipeline()
                     for item in items:
-                        mq.insert_into_change_info(item)
+                        mq.insert_sql("t_zx_company_change_info", item)
                         logger.info("插入成功---------------------数据 %s " % item)
-                    mq.close()
-
                 except Exception as e:
                     logger.debug(e)
         else:
             pass
         conn.sadd("tyc_get_changeinfo", tyc_id)
+    mq.close()
+
 
 if __name__ == "__main__":
     main()

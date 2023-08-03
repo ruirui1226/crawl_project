@@ -121,7 +121,7 @@ class ExampleSpider(scrapy.Spider):
         item["po_id"] = get_md5(detail_data.get("articleId"))
         item["create_datetime"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(time.time())))
         item["bid_url"] = detail_url
-        item["po_province"] = ""
+        item["po_province"] = "上海市"
         item["po_city"] = "上海市"
         item["po_county"] = meta.get("city")
         item["po_category"] = detail_data.get("categoryNames")[1]

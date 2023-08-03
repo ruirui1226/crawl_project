@@ -10,12 +10,14 @@
 import datetime
 import time
 
-import pandas as pd
+# import pandas as pd
 import scrapy
 from lxml import etree
 
 from bid_scrapy_project.common.common import get_md5
 from bid_scrapy_project.items import BidScrapyProjectItem, GovernmentProcurementItem
+
+from bid_scrapy_project.common.common import format_time
 
 
 class GgzyjyNmgSpider(scrapy.Spider):
@@ -65,7 +67,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
         tree = etree.fromstring(detail_htlm, parser)
         detail_text = ' '.join(tree.xpath('//text()')).strip().replace(' ', '')
         public_time = response.meta['public_time']
-        po_public_time = self.normalize_datetime(public_time)
+        po_public_time = format_time(public_time)
         contentUrl = response.meta['list_url']
         po_id = get_md5(contentUrl)
         item = GovernmentProcurementItem()
@@ -83,17 +85,17 @@ class GgzyjyNmgSpider(scrapy.Spider):
         item['create_datetime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(time.time())))
         yield item
 
-    def normalize_datetime(self, time_str):
-        try:
-            datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d %H:%M:%S")
-        except ValueError:
-            try:
-                datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d")
-            except ValueError:
-                try:
-                    datetime_obj = pd.to_datetime(time_str, format="%m/%d/%Y %I:%M %p")
-                except ValueError:
-                    return None
-
-        normalized_time_str = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
-        return normalized_time_str
+    # def normalize_datetime(self, time_str):
+    #     try:
+    #         datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d %H:%M:%S")
+    #     except ValueError:
+    #         try:
+    #             datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d")
+    #         except ValueError:
+    #             try:
+    #                 datetime_obj = pd.to_datetime(time_str, format="%m/%d/%Y %I:%M %p")
+    #             except ValueError:
+    #                 return None
+    #
+    #     normalized_time_str = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
+    #     return normalized_time_str

@@ -175,10 +175,10 @@ def main():
 
         items = get_History_Action_At_Law_info_detail(info_id, company_name, tyc_id, deatil_url)
         try:
-            mq = MysqlPipeline()
+            mq = MysqlPipelinePublic()
             for item in items:
-                mq.insert_into_HistoryActionAtLaw_info_detail(item)
-                mq.insert_sql(item, "t_zx_history_action_at_law_detail")
+                # mq.insert_into_HistoryActionAtLaw_info_detail(item)
+                mq.insert_sql("t_zx_history_action_at_law_detail", item)
             mq.close()
         except Exception as e:
             logger.debug(e)

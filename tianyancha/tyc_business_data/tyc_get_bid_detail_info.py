@@ -87,12 +87,11 @@ def get_bid_det_info(info_id, company_name, tyc_id, b_id):
         return item
 
     else:
-        print('')
+        print("")
         return
 
 
 def main():
-
     det_req_name = "tyc_bid:tyc_get_bid_req_info"
     det_filter_name = "tyc_bid:tyc_get_bid_det_info"
     data_list = conn.smembers(det_req_name)

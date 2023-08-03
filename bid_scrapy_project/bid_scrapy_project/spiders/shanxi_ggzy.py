@@ -57,13 +57,15 @@ class ShanxiGgzySpider(scrapy.Spider):
                 secondary_href = li.xpath("./a/@href").extract_first()  # 二级分类url
                 # 第二页的时候参数变化
                 if page > 1:
-                    secondary_href = secondary_href.replace("subPage_jyxx", "{}".format(page))
-                secondary_href = response.urljoin(secondary_href)  # 补齐url
+                    next_href = secondary_href.replace("subPage_jyxx", "{}".format(page))
+                else:
+                    next_href = secondary_href
+                next_href = response.urljoin(next_href)  # 补齐url
                 secondary_name = li.xpath("./a/text()").extract_first().strip()  # 二级分类名称
                 items = {"bid_info_type": secondary_name}
                 items.update(item)
                 yield scrapy.Request(
-                    secondary_href,
+                    next_href,
                     callback=self.getContentParse,
                     meta={"items": items},
                     dont_filter=True
@@ -121,7 +123,7 @@ class ShanxiGgzySpider(scrapy.Spider):
         content = "".join(response.xpath('//div[@class="epoint-article-content"]//text()|//div[@class="epoint-article-content jynr news_content"]//text()').extract()).strip()
         if "政府采购" in item_info["bid_category"]:
             items_cg = GovernmentProcurementItem()
-            items_cg["po_province"] = "陕西"
+            items_cg["po_province"] = "陕西省"
             items_cg["website_name"] = "陕西省公共资源交易服务平台"
             items_cg["website_url"] = "http://www.sxggzyjy.cn/"
             items_cg["po_source"] = author
@@ -146,7 +148,7 @@ class ShanxiGgzySpider(scrapy.Spider):
                 bid_city="陕西省",
                 website_name="陕西省公共资源交易服务平台",
                 website_url="http://www.sxggzyjy.cn/",
-                bid_province="陕西",
+                bid_province="陕西省",
             )
             items_zy.update(item_info)
             items_zy["bid_public_time"] = pudate

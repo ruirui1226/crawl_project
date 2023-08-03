@@ -82,8 +82,8 @@ yum install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel read
 工商信息表 --已完成
 基本信息  --已完成
 股东信息  --已完成
-主要股东信息
-最终受益人
+主要股东信息  --已完成
+最终受益人  --已完成
 变更记录
 
 

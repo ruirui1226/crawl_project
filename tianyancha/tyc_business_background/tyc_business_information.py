@@ -23,6 +23,7 @@ from tianyancha.untils.redis_conn import conn
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from tianyancha.untils.urls import BUSINESS_INFORMATION
+from untils.sql_data import TYC_DATA
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -90,7 +91,7 @@ def get_business_info(info_id, company_name, tyc_id, tyc_hi, Authorization, duid
         res = requests.get(url, headers=headers, verify=False).text
         res_json = json.loads(res)
         logger.debug(res_json)
-        # create_json(info_id, tyc_id, company_name, res_json)
+        create_json(info_id, tyc_id, company_name, res_json)
         if res_json["data"]:
             bussiness_info = res_json["data"]["baseInfo"]
         else:
@@ -212,17 +213,17 @@ def get_business_info(info_id, company_name, tyc_id, tyc_hi, Authorization, duid
 
 
 def main():
-    data_list = get_company_230420_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         pageNum = 1
         # ex_d = conn.srem("patent_tyc_id", tyc_id)
         # if ex_d:
         ex = conn.sadd("business_tyc_id", tyc_id)
         if ex == 1:
-            time.sleep(0.8)
             data = get_authoriaztion(info_id, company_name, tyc_id, pageNum)
             logger.warning("当前企业名称为%s" % company_name)
             tyc_hi = data["data"]["tyc_hi"]
@@ -248,7 +249,6 @@ def main():
                     branchList_info_items = None
 
                 try:
-                    mq = MysqlPipelinePublic()
                     # mq.insert_into_Bussiness_info("t_zx_company_bussiness_base_info", baseInfo_item)
                     mq.insert_sql("t_zx_company_bussiness_base_info", baseInfo_item)
                     logger.info("数据 %s 插入成功" % baseInfo_item)
@@ -257,7 +257,6 @@ def main():
                             # mq.insert_into_Branch_info(branchList_info_item)
                             mq.insert_sql("t_zx_company_branch_info", branchList_info_item)
                             logger.info("数据%s 插入成功" % branchList_info_item)
-                        mq.close()
                 except Exception as e:
                     logger.debug(e)
             else:
@@ -265,6 +264,7 @@ def main():
         else:
             logger.debug("%s---------数据已经采集，无需再次采集" % tyc_id)
             pass
+    mq.close()
 
 
 if __name__ == "__main__":

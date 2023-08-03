@@ -29,6 +29,7 @@ except:
 
 mq = MysqlPipelinePublic()
 
+
 def create_json(pageNum, info_id, tyc_id, company_name, res_json, regNo):
     folder_name = FILE_PATH + "/tyc_trademark_detail_file__商标信息详情/"
     if not os.path.exists(folder_name):
@@ -153,7 +154,6 @@ def get_Trademark_detail_info(
 
 
 def main():
-    # data_list = get_company_230420_name_detail()
     # data_list=get_company_wechat_name()
     data_list = conn.smembers("t_zx_company_trademark_info_det_req")
     # mq = MysqlPipelinePublic()

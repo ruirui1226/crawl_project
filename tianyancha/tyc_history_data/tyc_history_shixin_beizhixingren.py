@@ -22,6 +22,8 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from untils.urls import HISTORY_SHIXIN_BEIZHIXINGREN
 
+from untils.sql_data import TYC_DATA
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -178,7 +180,7 @@ def get_breach_of_the_person_subjected_to_execution_info(info_id, company_name, 
         # logger.debug(res)
         res_json = json.loads(res)
 
-        create_json(pageNum, info_id, tyc_id, company_name, res_json)
+        # create_json(pageNum, info_id, tyc_id, company_name, res_json)
         items = []
         for trademark_info in res_json["data"]["items"]:
             item = {
@@ -220,12 +222,12 @@ def get_breach_of_the_person_subjected_to_execution_info(info_id, company_name, 
 
 
 def main():
-    data_list = get_company_230420_name()
-    # data_list=get_company_wechat_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         initial_pageNum = 1
 
         logger.warning("当前企业名称为%s" % company_name)
@@ -243,16 +245,14 @@ def main():
             for pageNum in range(1, int(pages_total) + 1):
                 items = get_breach_of_the_person_subjected_to_execution_info(info_id, company_name, tyc_id, pageNum)
                 try:
-                    mq = MysqlPipelinePublic()
                     for item in items:
                         mq.insert_sql("t_zx_history_shixinbeizhixingren", item)
-                    mq.close()
-
                 except Exception as e:
                     logger.debug(e)
         else:
             pass
         # delete_to_mysql_wechat_main(info_id,company_name)
+    mq.close()
 
 
 if __name__ == "__main__":

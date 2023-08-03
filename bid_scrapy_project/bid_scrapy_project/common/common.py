@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 # @Time : 2023/6/14 10:43
 # @Author: mayj
-
-import hashlib
-import datetime
-import json
-import logging
 import re
 import time
-from urllib.parse import urljoin
+import hashlib
+import datetime
+from datetime import datetime as datetime1
 
+import logging
+from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 from lxml import html
 from pymysql.converters import escape_string
@@ -133,3 +132,65 @@ def remove_node(HTML, tags):
             e.getparent().remove(e)
     Html = html.tostring(tree).decode()
     return BeautifulSoup(Html, "lxml")
+
+
+def format_time(time_str):
+    time_str = str(time_str)
+    # 定义各种可能的时间格式
+    if "日" in time_str or "秒" in time_str:
+        time_str = (
+            time_str.replace("年", "-")
+            .replace("月", "-")
+            .replace("日", "")
+            .replace("T", " ")
+            .replace("时", "")
+            .replace("分", ":")
+            .replace("秒", "")
+            .replace("：", ":")
+        )
+    else:
+        time_str = (
+            time_str.replace("年", "-")
+            .replace("月", "")
+            .replace("T", " ")
+            .replace("时", "")
+            .replace("分", "")
+            .replace("：", ":")
+        )
+    if "上午" in time_str:
+        time_str = time_str.replace("上午", "AM")
+    elif "下午" in time_str:
+        time_str = time_str.replace("下午", "PM")
+    formats = [
+        "%Y-%m-%d%p%I:%M",
+        "%Y-%m-%d%p%I:%M:%S",
+        "%Y-%m-%d %p%I:%M",
+        "%Y-%m-%d %p%I:%M:%S",
+        "%Y-%m-%d%I:%M%p",
+        "%Y-%m-%d%I:%M:%S%p",
+        "%Y-%m-%d %I:%M%p",
+        "%Y-%m-%d %I:%M:%S%p",
+        "%Y-%m-%d %H:%M:%S",
+        "%Y/%m/%d %H:%M:%S",
+        "%Y-%m-%d %H:%M",
+        "%Y/%m/%d %H:%M",
+        "%Y-%m-%d%H:%M:%S",
+        "%Y/%m/%d%H:%M:%S",
+        "%Y-%m-%d%H:%M",
+        "%Y/%m/%d%H:%M",
+        "%Y-%m-%d",
+        "%Y/%m/%d",
+        "%H:%M:%S",
+        "%H:%M",
+    ]
+
+    for fmt in formats:
+        try:
+            dt = datetime1.strptime(time_str, fmt)
+            formatted_time = dt.strftime("%Y-%m-%d %H:%M:%S")
+            return formatted_time
+
+        except ValueError:
+            pass
+
+    return time_str

@@ -21,6 +21,7 @@ from untils.redis_conn import conn
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from tianyancha.untils.urls import INVESTMENTS_ABROAD
+from untils.sql_data import TYC_DATA
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -147,7 +148,7 @@ def get_Invest_info(info_id, company_name, tyc_id, pageNum, x_auth_token):
         print("kkkkk", res)
         res_json = json.loads(res)
 
-        create_json(info_id, tyc_id, company_name, res_json)
+        # create_json(info_id, tyc_id, company_name, res_json)
         items = []
         for invest_info in res_json["data"]["result"]:
             item = {
@@ -197,11 +198,12 @@ def get_Invest_info(info_id, company_name, tyc_id, pageNum, x_auth_token):
 
 
 def main():
-    data_list = get_company_230420_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         pageNum = 1
 
         logger.warning("当前企业名称为%s" % company_name)
@@ -219,23 +221,19 @@ def main():
             info_id, company_name, tyc_id, tyc_hi, Authorization, duid, deviceID, x_auth_token
         )
         if pages_total:
-            print(company_name)
             for pageNum in range(1, int(pages_total) + 1):
                 # get_publicWechat_info(info_id, company_name, tyc_id, pageNum)
                 items = get_Invest_info(info_id, company_name, tyc_id, pageNum, x_auth_token)
                 try:
-                    mq = MysqlPipelinePublic()
                     for item in items:
                         mq.insert_sql("t_zx_company_invest_info", item)
                         # logger.info("插入成功---------------------数据 %s " % item)
-                        print("===", item)
-                    mq.close()
-
                 except Exception as e:
                     logger.debug(e)
         else:
             pass
         conn.sadd("tyc_investments_abroad", tyc_id)
+    mq.close()
 
 
 if __name__ == "__main__":

@@ -17,11 +17,13 @@ import math
 from tianyancha.conf.env import *
 from tianyancha.untils.pysql import *
 from untils.redis_conn import conn
+
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 
 from tianyancha.untils.urls import ACTUAL_CONTROL_INFO
+from untils.sql_data import TYC_DATA
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -94,7 +96,7 @@ def get_actualcontrol_detail(info_id, company_name, tyc_id, tyc_hi, Authorizatio
 
     res_json = json.loads(res)
     print("====", res_json)
-    create_json(info_id, tyc_id, company_name, res_json)
+    # create_json(info_id, tyc_id, company_name, res_json)
     if res_json["data"]:
         item = {
             "company_name": company_name,
@@ -118,17 +120,16 @@ def get_actualcontrol_detail(info_id, company_name, tyc_id, tyc_hi, Authorizatio
 
 
 def main():
-    data_list = get_company_230420_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         pageNum = 1
-
-        if conn.sismember("tyc_investments_abroad", tyc_id):
-            logger.debug("{}=======>数据已经采集，无需再次采集".format(tyc_id))
-            continue
-
+        # if conn.sismember("tyc_investments_abroad", tyc_id):
+        #     logger.debug("{}=======>数据已经采集，无需再次采集".format(tyc_id))
+        #     continue
         data = get_authoriaztion(info_id, company_name, tyc_id, pageNum)
         tyc_hi = data["data"]["tyc_hi"]
         Authorization = data["data"]["Authorization"]
@@ -140,15 +141,13 @@ def main():
         )
         if item:
             try:
-                mq = MysqlPipelinePublic()
                 mq.insert_sql("t_zx_company_actualcontrol_detail", item)
-                mq.close()
-
             except Exception as e:
                 logger.debug(e)
         else:
             pass
-        conn.sadd("tyc_investments_abroad", tyc_id)
+        # conn.sadd("tyc_investments_abroad", tyc_id)
+    mq.close()
 
 
 if __name__ == "__main__":

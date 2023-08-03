@@ -10,12 +10,14 @@
 import json
 import time
 
-import pandas as pd
+# import pandas as pd
 import requests
 import scrapy
 
 from bid_scrapy_project.common.common import get_md5
 from bid_scrapy_project.items import BidScrapyProjectItem, GovernmentProcurementItem
+
+from bid_scrapy_project.common.common import format_time
 
 
 class GgzyjyNmgSpider(scrapy.Spider):
@@ -114,7 +116,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
         detail_htlm = response.xpath("//div[@class='zf_mainconlist1']").get()
         detail_text = ' '.join(response.xpath('//div[@class="zf_mainconlist1"]//text()').extract()).strip()
         bid_public_time = response.meta['time']
-        po_public_time = self.normalize_datetime(bid_public_time)
+        po_public_time = format_time(bid_public_time)
         contentUrl = response.meta['url']
         bid_id = get_md5(contentUrl)
         item = BidScrapyProjectItem()
@@ -133,17 +135,17 @@ class GgzyjyNmgSpider(scrapy.Spider):
         item['create_datetime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(time.time())))
         yield item
 
-    def normalize_datetime(self, time_str):
-        try:
-            datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d %H:%M:%S")
-        except ValueError:
-            try:
-                datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d")
-            except ValueError:
-                try:
-                    datetime_obj = pd.to_datetime(time_str, format="%m/%d/%Y %I:%M %p")
-                except ValueError:
-                    return None
-
-        normalized_time_str = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
-        return normalized_time_str
+    # def normalize_datetime(self, time_str):
+    #     try:
+    #         datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d %H:%M:%S")
+    #     except ValueError:
+    #         try:
+    #             datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d")
+    #         except ValueError:
+    #             try:
+    #                 datetime_obj = pd.to_datetime(time_str, format="%m/%d/%Y %I:%M %p")
+    #             except ValueError:
+    #                 return None
+    #
+    #     normalized_time_str = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
+    #     return normalized_time_str

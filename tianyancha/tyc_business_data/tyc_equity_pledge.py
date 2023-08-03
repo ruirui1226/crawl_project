@@ -22,6 +22,7 @@ from untils.redis_conn import conn
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+from untils.sql_data import TYC_DATA
 from untils.urls import EQUITY_PLEDGE
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -163,7 +164,7 @@ def get_equity_pledge_info(info_id, company_name, tyc_id, pageNum):
         res = requests.get(url=url, headers=headers, verify=False).text
         # logger.debug(res)
         res_json = json.loads(res)
-        create_json(pageNum, info_id, tyc_id, company_name, res_json)
+        # create_json(pageNum, info_id, tyc_id, company_name, res_json)
         items_list = res_json["data"]["items"]
         items = []
 
@@ -182,23 +183,14 @@ def get_equity_pledge_info(info_id, company_name, tyc_id, pageNum):
                 "changeSituation": ite.get("changeSituation", ""),
                 "regNumber": ite.get("regNumber", ""),
                 "certifNumber": ite.get("certifNumber", ""),
-                # "companyList": ",".join(format(log) for log in ite.get("companyList"))
-                # if ite.get("companyList") is not None
-                # else "",
-                "companyList": str(ite.get("companyList")).replace("'", '"') or "",
+                "companyList": str(ite.get("companyList", "")).replace("'", '"'),
                 "targetCompany": ite.get("targetCompany", ""),
                 "equityAmount": ite.get("equityAmount", ""),
                 "t_id": ite.get("id", ""),
                 "state": ite.get("state", ""),
-                # "pledgeeList": ",".join(format(log) for log in ite.get("pledgeeList"))
-                # if ite.get("pledgeeList") is not None
-                # else "",
-                "pledgeeList": str(ite.get("pledgeeList")).replace("'", '"') or "",
-                "pledgorStr": str(ite.get("pledgorStr", "")).replace("'", '"') or "",
-                # "pledgorList": ",".join(format(log) for log in ite.get("pledgorList"))
-                # if ite.get("pledgorList") is not None
-                # else "",
-                "pledgorList": str(ite.get("pledgorList")).replace("'", '"'),
+                "pledgeeList": str(ite.get("pledgeeList", "")).replace("'", '"'),
+                "pledgorStr": str(ite.get("pledgorStr", "")).replace("'", '"'),
+                "pledgorList": str(ite.get("pledgorList", "")).replace("'", '"'),
                 "putDate": ite.get("putDate", ""),
                 "remarks": ite.get("remarks", ""),
                 "base": ite.get("base", ""),
@@ -216,12 +208,12 @@ def get_equity_pledge_info(info_id, company_name, tyc_id, pageNum):
 
 
 def main():
-    data_list = get_company_230420_name()
-    # data_list=get_company_wechat_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         initial_pageNum = 1
         ex = conn.sadd("tyc_equity_pledge", tyc_id)
         logger.warning("当前企业ID为-------%s" % tyc_id)
@@ -241,11 +233,8 @@ def main():
                 for pageNum in range(1, int(pages_total) + 1):
                     items = get_equity_pledge_info(info_id, company_name, tyc_id, pageNum)
                     try:
-                        mq = MysqlPipelinePublic()
                         for item in items:
                             mq.insert_sql("t_zx_equity_pledge", item)
-                        mq.close()
-
                     except Exception as e:
                         logger.debug(e)
             else:
@@ -254,6 +243,7 @@ def main():
             logger.debug("{}=======>数据已经采集，无需再次采集".format(tyc_id))
             pass
         # delete_to_mysql_wechat_main(info_id,company_name)
+    mq.close()
 
 
 if __name__ == "__main__":

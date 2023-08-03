@@ -27,7 +27,9 @@ try:
 except:
     from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+    from untils.sql_data import TYC_DATA
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 def create_json(pageNum, info_id, tyc_id, company_name, res_json):
@@ -209,12 +211,12 @@ def get_Trademark_info(info_id, company_name, tyc_id, pageNum):
 
 
 def main():
-    data_list = get_company_230329_name()
-    # data_list=get_company_wechat_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         pageNum = 1
         logger.warning("当前企业名称为%s" % company_name)
         if conn.sismember("tyc_get_trademark_info", tyc_id):
@@ -240,7 +242,6 @@ def main():
 
         if pages_total:
             logger.info(f"共获取到{int(pages_total)}页数据")
-            mq = MysqlPipelinePublic()
             for pageNum in range(1, int(pages_total) + 1):
                 items = get_Trademark_info(info_id, company_name, tyc_id, pageNum)
                 for item in items:
@@ -267,6 +268,7 @@ def main():
             pass
         conn.sadd("tyc_get_trademark_info", tyc_id)
         # delete_to_mysql_wechat_main(info_id,company_name)
+    mq.close()
 
 
 if __name__ == "__main__":

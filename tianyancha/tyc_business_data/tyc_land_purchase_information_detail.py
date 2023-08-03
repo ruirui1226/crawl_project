@@ -12,10 +12,13 @@ import uuid
 from tyc_projects.conf.env import *
 from untils.pysql import *
 import re
+
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from untils.redis_conn import conn
+
+from untils.sql_data import TYC_DATA
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -184,21 +187,21 @@ def get_land_purchase_info(pageNum, info_id, company_name, tyc_id):
                 "actualCompletionTime": zhaopin_info.get("actualCompletionTime", ""),
                 "tyc_id": tyc_id,
             }
-            
+
             items.append(item)
         return items
-
 
     except Exception as e:
         logger.debug(e)
 
 
 def main():
-    data_list = get_company_230420_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
 
         pageNum = 1
         ex = conn.sismember("tyc_land_purchase_detail1", tyc_id)
@@ -221,19 +224,17 @@ def main():
                     items = get_land_purchase_info(pageNum, info_id, company_name, tyc_id)
                     try:
                         pass
-                        mq = MysqlPipelinePublic()
                         for item in items:
-                            # mq.insert_sql("t_zx_tyc_land_purchase_information_detail", item)
-                            mq = MysqlPipeline()
-                            mq.insert_into_administrative_licensing_detail1(item)
+                            mq.insert_sql("t_zx_tyc_land_purchase_information_detail", item)
+                            # mq = MysqlPipeline()
+                            # mq.insert_into_administrative_licensing_detail1(item)
                             logger.info("数据 %s 插入成功" % item)
-                        mq.close()
-
                     except Exception as e:
                         logger.debug(e)
             else:
                 pass
         conn.sadd("tyc_land_purchase_detail1", tyc_id)
+    mq.close()
 
 
 if __name__ == "__main__":

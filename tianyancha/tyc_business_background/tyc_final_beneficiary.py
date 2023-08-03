@@ -17,10 +17,12 @@ from tianyancha.untils.pysql import *
 from tianyancha.conf.env import *
 import uuid
 from untils.redis_conn import conn
+
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from tianyancha.untils.urls import FINAL_BENEFICIARY
+from untils.sql_data import TYC_DATA
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -53,60 +55,57 @@ def get_authoriaztion(info_id, company_name, tyc_id, pageNum):
 
 def get_Trademark_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid, deviceID, x_auth_token):
     # try:
-        headers = {
-            # """
-            "x-b3-traceid-jindi": "",
-            "x-b3-sampled-jindi": "",
-            "Authorization": Authorization,
-            "version": "Android 12.67.0",
-            "X-Auth-Token": x_auth_token,
-            "Content-Type": "application/json",
-            "channelID": "huawei",
-            "deviceID": "1bbaf81111eb23c5",
-            "deviceModel": "Nexus 6P",
-            "deviceVersion": "8.1.0",
-            "tyc-hi": tyc_hi,
-            "sensorsAnonymousId": deviceID,
-            "device-uuid": deviceID,
-            "tdid": "36c73d82d939322125bf91fa8ae59b3d5",
-            "device_uuid": deviceID,
-            "app_channel": "huawei",
-            "app-code": "670",
-            "androidid": deviceID,
-            "oaid": "00000000-0000-0000-0000-000000000000",
-            # "Connection": close
-            "User-Agent": "com.tianyancha.skyeye/Dalvik/2.1.0 (Linux; U; Android 8.1.0; Nexus 6P Build/OPM7.181205.001; appDevice/google_QAQ_Nexus 6P)",
-            "Cache-Control": "no-cache, no-store",
-            "Host": "api6.tianyancha.com",
-            "Accept-Encoding": "gzip",
-        }
+    headers = {
+        # """
+        "x-b3-traceid-jindi": "",
+        "x-b3-sampled-jindi": "",
+        "Authorization": Authorization,
+        "version": "Android 12.67.0",
+        "X-Auth-Token": x_auth_token,
+        "Content-Type": "application/json",
+        "channelID": "huawei",
+        "deviceID": "1bbaf81111eb23c5",
+        "deviceModel": "Nexus 6P",
+        "deviceVersion": "8.1.0",
+        "tyc-hi": tyc_hi,
+        "sensorsAnonymousId": deviceID,
+        "device-uuid": deviceID,
+        "tdid": "36c73d82d939322125bf91fa8ae59b3d5",
+        "device_uuid": deviceID,
+        "app_channel": "huawei",
+        "app-code": "670",
+        "androidid": deviceID,
+        "oaid": "00000000-0000-0000-0000-000000000000",
+        # "Connection": close
+        "User-Agent": "com.tianyancha.skyeye/Dalvik/2.1.0 (Linux; U; Android 8.1.0; Nexus 6P Build/OPM7.181205.001; appDevice/google_QAQ_Nexus 6P)",
+        "Cache-Control": "no-cache, no-store",
+        "Host": "api6.tianyancha.com",
+        "Accept-Encoding": "gzip",
+    }
 
-        url = FINAL_BENEFICIARY.format(tyc_id, "1")
-        res = requests.get(url=url, headers=headers, verify=False).text
+    url = FINAL_BENEFICIARY.format(tyc_id, "1")
+    res = requests.get(url=url, headers=headers, verify=False).text
 
-        logger.debug(res)
-        res_json = json.loads(res)
-        if "total" in str(res_json["data"]):
-            pages_total = math.ceil(int(res_json["data"]["total"]) / 20)
+    logger.debug(res)
+    res_json = json.loads(res)
+    if "total" in str(res_json["data"]):
+        pages_total = math.ceil(int(res_json["data"]["total"]) / 20)
 
-            if pages_total:
-                # print(1)
-                return pages_total
-            else:
-                # print(2)
-                return 1
-        # elif int(res_json["data"]["count"]) > 0:
-        elif "total" in str(res_json["data"]):
-            pages_total = math.ceil(int(res_json["data"]["count"]) / 20)
-            if pages_total:
-                # print(3)
-                return pages_total
+        if pages_total:
+            return pages_total
         else:
-            logger.debug("%s没有信息" % company_name)
-            # print(4)
             return 1
-    # except Exception as e:
-    #     logger.debug(e)
+    elif "total" in str(res_json["data"]):
+        pages_total = math.ceil(int(res_json["data"]["count"]) / 20)
+        if pages_total:
+            return pages_total
+    else:
+        logger.debug("%s没有信息" % company_name)
+        return 1
+
+
+# except Exception as e:
+#     logger.debug(e)
 
 
 def get_Trademark_info(info_id, company_name, tyc_id, pageNum):
@@ -183,12 +182,12 @@ def get_Trademark_info(info_id, company_name, tyc_id, pageNum):
 
 
 def main():
-    data_list = get_company_230420_name()
-    # data_list=get_company_wechat_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         pageNum = 1
 
         logger.warning("当前企业名称为%s" % company_name)
@@ -211,17 +210,15 @@ def main():
         for pageNum in range(1, int(pages_total) + 1):
             items = get_Trademark_info(info_id, company_name, tyc_id, pageNum)
             try:
-                mq = MysqlPipelinePublic()
                 for item in items:
                     mq.insert_sql("t_zx_tyc_final_beneficiary", item)
-                    # print(f"======插入===={item}====")
-                mq.close()
             except Exception as e:
                 logger.debug(e)
             else:
                 pass
         # delete_to_mysql_wechat_main(info_id,company_name)
         conn.sadd("tyc_final_beneficiary", tyc_id)
+    mq.close()
 
 
 if __name__ == "__main__":

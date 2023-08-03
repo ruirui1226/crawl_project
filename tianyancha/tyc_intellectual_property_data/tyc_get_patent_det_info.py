@@ -59,8 +59,6 @@ def get_authoriaztion(info_id, company_name, p_id):
     return data
 
 
-
-
 def get_Patent_det_info(info_id, company_name, tyc_id, p_id):
     url = PATENT_DETAIL.format(p_id)
     logger.warning(url)
@@ -104,87 +102,97 @@ def get_Patent_det_info(info_id, company_name, tyc_id, p_id):
     if patent_det_info:
         item = {
             "info_id": info_id,
-
-            "p_id":patent_det_info.get('id',''),
-            "patentId":patent_det_info.get('patentId',''),
-            "patentNum":patent_det_info.get('patentNum',''),
-            "applicationPublishNum":patent_det_info.get('applicationPublishNum',''),
-            "applicationTime":patent_det_info.get('applicationTime',''),
-            "appubDate":patent_det_info.get('appubDate',''),
-            "grantDate":patent_det_info.get('grantDate',''),
-            "applicationPublishTime":patent_det_info.get('applicationPublishTime',''),
-            "patentName":patent_det_info.get('patentName','').replace("'",'‘'),
-            "mainCatNum":patent_det_info.get('mainCatNum',''),
-            "allCatNum":patent_det_info.get('allCatNum','').replace("'",'‘') if patent_det_info.get('allCatNum','') else patent_det_info.get('allCatNum',''),
-            "inventor":patent_det_info.get('inventor',''),
-            "agency":patent_det_info.get('agency',''),
-            "agent":patent_det_info.get('agent',''),
-            "agencyLink":patent_det_info.get('agencyLink',''),
-            "address":patent_det_info.get('address',''),
-            "postCode":patent_det_info.get('postCode',''),
-            "lprs":patent_det_info.get('lprs',''),
-            "patentType":patent_det_info.get('patentType',''),
-            "statusCode":patent_det_info.get('statusCode',''),
-            "applicantNameAgo":patent_det_info.get('applicantNameAgo','').replace("'",'‘'),
-            "applicantNameNow":patent_det_info.get('applicantNameNow',''),
-            "pdfPath":patent_det_info.get('pdfPath',''),
-            "lprsInfoPath":patent_det_info.get('lprsInfoPath',''),
-            "priorityPath":patent_det_info.get('priorityPath',''),
-            "familyPath":patent_det_info.get('familyPath',''),
-            "familyNo":patent_det_info.get('familyNo',''),
-            "compareFilesPath":patent_det_info.get('compareFilesPath',''),
-            "addrProvince":patent_det_info.get('addrProvince',''),
-            "addrCity":patent_det_info.get('addrCity',''),
-            "addrCounty":patent_det_info.get('addrCounty',''),
-            "iapp":patent_det_info.get('iapp',''),
-            "ipub":patent_det_info.get('ipub',''),
-            "den":patent_det_info.get('den',''),
-            "clPath":patent_det_info.get('clPath',''),
-            "proCode":patent_det_info.get('proCode',''),
-            "appCoun":patent_det_info.get('appCoun',''),
-            "issueDate":patent_det_info.get('issueDate',''),
-            "isDeleted":patent_det_info.get('isDeleted',''),
-            "sourceWeb":patent_det_info.get('sourceWeb',''),
-            "dbName":patent_det_info.get('dbName',''),
-            "tifDistributePath":patent_det_info.get('tifDistributePath',''),
-            "pages":patent_det_info.get('pages',''),
-            "divideInitAppNo":patent_det_info.get('divideInitAppNo',''),
-            "pid":patent_det_info.get('pid',''),
-            "sysid":patent_det_info.get('sysid',''),
-            "property1":patent_det_info.get('property1',''),
-            "property2":patent_det_info.get('property2',''),
-            "property3":patent_det_info.get('property3',''),
-            "createDate":patent_det_info.get('createDate',''),
-            "updateTime":patent_det_info.get('updateTime',''),
-            "abstracts":patent_det_info.get('abstracts','').replace("'",'‘') if patent_det_info.get('abstracts','') else patent_det_info.get('abstracts',''),
-            "claims": patent_det_info.get('claims', '').replace("'",'‘') if patent_det_info.get('claims', '') else patent_det_info.get('claims', ''),
-            "description": patent_det_info.get('description', '').replace("'",'‘') if patent_det_info.get('description', '') else patent_det_info.get('description', ''),
-            "imageUrlList": json.dumps(patent_det_info.get('imageUrlList', ''), ensure_ascii=False),
-            "applicantName": patent_det_info.get('applicantName', '').replace("'",'‘') if patent_det_info.get('applicantName', '') else patent_det_info.get('applicantName', ''),
-            "applicantNames": json.dumps(patent_det_info.get('applicantNames', ''), ensure_ascii=False).replace("'",'‘') if patent_det_info.get('applicantNames', '') else patent_det_info.get('applicantNames', ''),
-            "agencyId": patent_det_info.get('agencyId', ''),
-            "applicationType": patent_det_info.get('applicationType', ''),
-            "stateOfLaw": json.dumps(patent_det_info.get('stateOfLaw', ''), ensure_ascii=False),
-            "priorityList": json.dumps(patent_det_info.get('priorityList', ''), ensure_ascii=False),
-            "applyFlow": json.dumps(patent_det_info.get('applyFlow', ''), ensure_ascii=False),
-            "grantNumber": patent_det_info.get('grantNumber', ''),
-            "expectEndDate": patent_det_info.get('expectEndDate', ''),
-            "reviewPath": patent_det_info.get('reviewPath', ''),
-
-
+            "p_id": patent_det_info.get("id", ""),
+            "patentId": patent_det_info.get("patentId", ""),
+            "patentNum": patent_det_info.get("patentNum", ""),
+            "applicationPublishNum": patent_det_info.get("applicationPublishNum", ""),
+            "applicationTime": patent_det_info.get("applicationTime", ""),
+            "appubDate": patent_det_info.get("appubDate", ""),
+            "grantDate": patent_det_info.get("grantDate", ""),
+            "applicationPublishTime": patent_det_info.get("applicationPublishTime", ""),
+            "patentName": patent_det_info.get("patentName", "").replace("'", "‘"),
+            "mainCatNum": patent_det_info.get("mainCatNum", ""),
+            "allCatNum": patent_det_info.get("allCatNum", "").replace("'", "‘")
+            if patent_det_info.get("allCatNum", "")
+            else patent_det_info.get("allCatNum", ""),
+            "inventor": patent_det_info.get("inventor", ""),
+            "agency": patent_det_info.get("agency", ""),
+            "agent": patent_det_info.get("agent", ""),
+            "agencyLink": patent_det_info.get("agencyLink", ""),
+            "address": patent_det_info.get("address", ""),
+            "postCode": patent_det_info.get("postCode", ""),
+            "lprs": patent_det_info.get("lprs", ""),
+            "patentType": patent_det_info.get("patentType", ""),
+            "statusCode": patent_det_info.get("statusCode", ""),
+            "applicantNameAgo": patent_det_info.get("applicantNameAgo", "").replace("'", "‘"),
+            "applicantNameNow": patent_det_info.get("applicantNameNow", ""),
+            "pdfPath": patent_det_info.get("pdfPath", ""),
+            "lprsInfoPath": patent_det_info.get("lprsInfoPath", ""),
+            "priorityPath": patent_det_info.get("priorityPath", ""),
+            "familyPath": patent_det_info.get("familyPath", ""),
+            "familyNo": patent_det_info.get("familyNo", ""),
+            "compareFilesPath": patent_det_info.get("compareFilesPath", ""),
+            "addrProvince": patent_det_info.get("addrProvince", ""),
+            "addrCity": patent_det_info.get("addrCity", ""),
+            "addrCounty": patent_det_info.get("addrCounty", ""),
+            "iapp": patent_det_info.get("iapp", ""),
+            "ipub": patent_det_info.get("ipub", ""),
+            "den": patent_det_info.get("den", ""),
+            "clPath": patent_det_info.get("clPath", ""),
+            "proCode": patent_det_info.get("proCode", ""),
+            "appCoun": patent_det_info.get("appCoun", ""),
+            "issueDate": patent_det_info.get("issueDate", ""),
+            "isDeleted": patent_det_info.get("isDeleted", ""),
+            "sourceWeb": patent_det_info.get("sourceWeb", ""),
+            "dbName": patent_det_info.get("dbName", ""),
+            "tifDistributePath": patent_det_info.get("tifDistributePath", ""),
+            "pages": patent_det_info.get("pages", ""),
+            "divideInitAppNo": patent_det_info.get("divideInitAppNo", ""),
+            "pid": patent_det_info.get("pid", ""),
+            "sysid": patent_det_info.get("sysid", ""),
+            "property1": patent_det_info.get("property1", ""),
+            "property2": patent_det_info.get("property2", ""),
+            "property3": patent_det_info.get("property3", ""),
+            "createDate": patent_det_info.get("createDate", ""),
+            "updateTime": patent_det_info.get("updateTime", ""),
+            "abstracts": patent_det_info.get("abstracts", "").replace("'", "‘")
+            if patent_det_info.get("abstracts", "")
+            else patent_det_info.get("abstracts", ""),
+            "claims": patent_det_info.get("claims", "").replace("'", "‘")
+            if patent_det_info.get("claims", "")
+            else patent_det_info.get("claims", ""),
+            "description": patent_det_info.get("description", "").replace("'", "‘")
+            if patent_det_info.get("description", "")
+            else patent_det_info.get("description", ""),
+            "imageUrlList": json.dumps(patent_det_info.get("imageUrlList", ""), ensure_ascii=False),
+            "applicantName": patent_det_info.get("applicantName", "").replace("'", "‘")
+            if patent_det_info.get("applicantName", "")
+            else patent_det_info.get("applicantName", ""),
+            "applicantNames": json.dumps(patent_det_info.get("applicantNames", ""), ensure_ascii=False).replace(
+                "'", "‘"
+            )
+            if patent_det_info.get("applicantNames", "")
+            else patent_det_info.get("applicantNames", ""),
+            "agencyId": patent_det_info.get("agencyId", ""),
+            "applicationType": patent_det_info.get("applicationType", ""),
+            "stateOfLaw": json.dumps(patent_det_info.get("stateOfLaw", ""), ensure_ascii=False),
+            "priorityList": json.dumps(patent_det_info.get("priorityList", ""), ensure_ascii=False),
+            "applyFlow": json.dumps(patent_det_info.get("applyFlow", ""), ensure_ascii=False),
+            "grantNumber": patent_det_info.get("grantNumber", ""),
+            "expectEndDate": patent_det_info.get("expectEndDate", ""),
+            "reviewPath": patent_det_info.get("reviewPath", ""),
             "company_name": company_name,
             "tyc_id": tyc_id,
             "create_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(time.time()))),
         }
-
 
         return item
 
     else:
         pass
 
-def main():
 
+def main():
     data_list = conn.smembers("tyc_get_patent_req_info")
 
     for data_str in data_list:
@@ -198,7 +206,7 @@ def main():
             logger.debug("{}=======>数据已经采集，无需再次采集".format(p_id))
             conn.srem("tyc_get_patent_req_info", data_str)
             continue
-        item = get_Patent_det_info(info_id,company_name,tyc_id,p_id)
+        item = get_Patent_det_info(info_id, company_name, tyc_id, p_id)
         logger.info(json.dumps(item))
         try:
             mq.insert_sql("t_zx_company_patent_det_info", item)
@@ -209,7 +217,6 @@ def main():
 
 
 def main1(data_str):
-
     # data_list = conn.smembers("tyc_get_patent_req_info")
 
     # for data_str in data_list:
@@ -224,22 +231,14 @@ def main1(data_str):
         conn.srem("tyc_get_patent_req_info", data_str)
         # continue
         return
-    item = get_Patent_det_info(info_id,company_name,tyc_id,p_id)
+    item = get_Patent_det_info(info_id, company_name, tyc_id, p_id)
     logger.info(json.dumps(item))
-    # try:
-    mq.insert_sql("t_zx_company_patent_det_info", item)
-    # except:
-    #     pass
+    try:
+        mq.insert_sql("t_zx_company_patent_det_info", item)
+    except:
+        pass
     conn.sadd("tyc_get_patent_det_info", p_id)
     conn.srem("tyc_get_patent_req_info", data_str)
-
-
-def divide_into_n_strand(listTemp, n):
-    """将一个list尽量均分成n份，限制len(list)==n，份数大于原list内元素个数则分配空list[]"""
-    twoList = [[] for i in range(n)]
-    for i, e in enumerate(listTemp):
-        twoList[i % n].append(e)
-    return twoList
 
 
 if __name__ == "__main__":

@@ -11,14 +11,16 @@ import os
 import time
 import math
 
-from untils.pysql import *
 from conf.env import *
 import uuid
 
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+from untils.pysql import *
 from untils.redis_conn import conn
+
+from untils.sql_data import TYC_DATA
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -45,7 +47,7 @@ def get_authoriaztion(info_id, company_name, tyc_id, pageNum):
 
     data = {"url": url, "version": version}
 
-    r = requests.post("http://127.0.0.1:9964/get_authorzation", data=json.dumps(data))
+    r = requests.post("http://127.0.0.1:9966/get_authorzation", data=json.dumps(data))
     logger.warning(r.text)
     data = json.loads(r.text)
     return data
@@ -143,13 +145,14 @@ def get_product_info(info_id, company_name, tyc_id, pageNum):
 
 
 def main():
-    data_list = get_company_230420_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         pageNum = 1
-        ex = conn.sismember("tyc_product_information", tyc_id)
+        ex = conn.sismember("t_zx_tyc_appbkinfo_file", tyc_id)
         if ex:
             logger.debug("%s---------数据已经采集，无需再次采集" % tyc_id)
             continue
@@ -160,24 +163,23 @@ def main():
         duid = data["data"]["duid"]
         deviceID = data["data"]["deviceID"]
         x_auth_token = data["data"]["x_auth_token"]
-        # get_Weibo_page(info_id, cEnvironmentalPenaltiesompany_name, tyc_id, tyc_hi, Authorization, duid, deviceID)
-        pages_total = get_product_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid, deviceID, x_auth_token)
+        pages_total = get_product_page(
+            info_id, company_name, tyc_id, tyc_hi, Authorization, duid, deviceID, x_auth_token
+        )
         if pages_total:
             print(company_name)
             for pageNum in range(1, int(pages_total) + 1):
                 items = get_product_info(info_id, company_name, tyc_id, pageNum)
                 try:
-                    mq = MysqlPipeline()
                     for item in items:
-                        mq.insert_into_appbkinfo_info(item)
+                        mq.insert_sql("t_zx_tyc_appbkinfo_file", item)
                         logger.info("数据 %s 插入成功" % item)
-                    mq.close()
-
                 except Exception as e:
                     logger.debug(e)
         else:
             pass
-        conn.sadd("tyc_product_information", tyc_id)
+        conn.sadd("t_zx_tyc_appbkinfo_file", tyc_id)
+    mq.close()
 
 
 if __name__ == "__main__":

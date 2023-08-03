@@ -14,6 +14,7 @@ import os
 import time
 import math
 from untils.pysql import *
+
 # from tyc_projects.conf.env import *
 
 # 忽略requests证书警告
@@ -113,7 +114,7 @@ def get_publicWechat_info(info_id, company_name, tyc_id, pageNum):
         logger.debug(res)
         res_json = json.loads(res)
 
-        create_json(company_name, res_json)
+        # create_json(company_name, res_json)
         items = []
         for wechat_info in res_json["data"]["resultList"]:
             item = {
@@ -135,11 +136,12 @@ def get_publicWechat_info(info_id, company_name, tyc_id, pageNum):
 
 
 def main():
-    data_list = get_company_name()
+    mq = MysqlPipelinePublic()
+    data_list = mq.select_sql("t_zx_company_tyc_all_infos", ["id", "company_name", "tyc_id"], {"is_lz": "1"})
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("company_name")
+        tyc_id = data.get("tyc_id")
         pageNum = 1
         data = get_authoriaztion(info_id, company_name, tyc_id, pageNum)
         tyc_hi = data["data"]["tyc_hi"]
@@ -147,23 +149,23 @@ def main():
         duid = data["data"]["duid"]
         deviceID = data["data"]["deviceID"]
         x_auth_token = data["data"]["x_auth_token"]
-        pages_total = get_publicWechat_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid, deviceID, x_auth_token)
+        pages_total = get_publicWechat_page(
+            info_id, company_name, tyc_id, tyc_hi, Authorization, duid, deviceID, x_auth_token
+        )
         if pages_total:
             print(company_name)
             for pageNum in range(1, int(pages_total) + 1):
                 items = get_publicWechat_info(info_id, company_name, tyc_id, pageNum)
                 try:
                     pass
-                    mq = MysqlPipeline()
                     for item in items:
-                        mq.insert_into_wechat_public_info(item)
+                        mq.insert_sql("t_zx_company_wechat_public_info", item)
                         logger.info("数据 %s 插入成功" % item)
-                    mq.close()
-
                 except Exception as e:
                     logger.debug(e)
         else:
             pass
+    mq.close()
 
 
 if __name__ == "__main__":

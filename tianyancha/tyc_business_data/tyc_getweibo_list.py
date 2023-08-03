@@ -12,7 +12,8 @@ import os
 import time
 import math
 from untils.pysql import *
-from tianyancha.conf.env import *
+
+# from tyc_projects.conf.env import *
 
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -39,13 +40,13 @@ def get_authoriaztion(info_id, company_name, tyc_id, pageNum):
     url = f"https://api6.tianyancha.com/cloud-business-state/weibo/list?pageSize=20&graphId={tyc_id}&pageNum={pageNum}"
     data = {"url": url, "version": version}
 
-    r = requests.post("http://127.0.0.1:9966/get_authorzation", data=json.dumps(data))
+    r = requests.post("http://127.0.0.1:9964/get_authorzation", data=json.dumps(data))
     logger.warning(r.text)
     data = json.loads(r.text)
     return data
 
 
-def get_Weibo_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid, deviceID,X_AUTH_TOKEN):
+def get_Weibo_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid, deviceID, X_AUTH_TOKEN):
     try:
         headers = {
             "user-agent": "com.tianyancha.skyeye/Dalvik/2.1.0 (Linux; U; Android 8.1.0; Nexus 6P Build/OPM7.181205.001; appDevice/google_QAQ_Nexus 6P)",
@@ -82,7 +83,7 @@ def get_Weibo_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid, d
         logger.debug(e)
 
 
-def get_Weibo_info(info_id, company_name, tyc_id, pageNum,X_AUTH_TOKEN):
+def get_Weibo_info(info_id, company_name, tyc_id, pageNum):
     try:
         url = f"https://api6.tianyancha.com/cloud-business-state/weibo/list?pageSize=20&graphId={tyc_id}&pageNum={pageNum}"
         logger.warning(url)
@@ -91,7 +92,7 @@ def get_Weibo_info(info_id, company_name, tyc_id, pageNum,X_AUTH_TOKEN):
         Authorization = data["data"]["Authorization"]
         duid = data["data"]["duid"]
         deviceID = data["data"]["deviceID"]
-
+        X_AUTH_TOKEN = data["data"]["x_auth_token"]
         headers = {
             "user-agent": "com.tianyancha.skyeye/Dalvik/2.1.0 (Linux; U; Android 8.1.0; Nexus 6P Build/OPM7.181205.001; appDevice/google_QAQ_Nexus 6P)",
             "authorization": Authorization,
@@ -108,7 +109,7 @@ def get_Weibo_info(info_id, company_name, tyc_id, pageNum,X_AUTH_TOKEN):
         logger.debug(res)
         res_json = json.loads(res)
 
-        create_json(company_name, res_json)
+        # create_json(company_name, res_json)
         items = []
         for weibo_info in res_json["data"]["result"]:
             if weibo_info["tags"]:
@@ -136,23 +137,24 @@ def get_Weibo_info(info_id, company_name, tyc_id, pageNum,X_AUTH_TOKEN):
 
 
 def main():
-    data_list = get_company_name()
+    mq = MysqlPipelinePublic()
+    data_list = mq.select_sql("t_zx_company_tyc_all_infos", ["id", "company_name", "tyc_id"], {"is_lz": "1"})
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("company_name")
+        tyc_id = data.get("tyc_id")
         pageNum = 1
         data = get_authoriaztion(info_id, company_name, tyc_id, pageNum)
         tyc_hi = data["data"]["tyc_hi"]
         Authorization = data["data"]["Authorization"]
         duid = data["data"]["duid"]
         deviceID = data["data"]["deviceID"]
-        X_AUTH_TOKEN = data["data"]["X_AUTH_TOKEN"]
-        pages_total = get_Weibo_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid, deviceID,X_AUTH_TOKEN)
+        x_auth_token = data["data"]["x_auth_token"]
+        pages_total = get_Weibo_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid, deviceID, x_auth_token)
         if pages_total:
             print(company_name)
             for pageNum in range(1, int(pages_total) + 1):
-                items = get_Weibo_info(info_id, company_name, tyc_id, pageNum,get_Weibo_info)
+                items = get_Weibo_info(info_id, company_name, tyc_id, pageNum)
                 try:
                     # mq = MysqlPipeline()
                     # for item in items:

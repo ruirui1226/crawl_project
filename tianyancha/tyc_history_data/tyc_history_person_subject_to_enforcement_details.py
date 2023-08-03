@@ -23,6 +23,8 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from untils.urls import HISTORY_PERSON_SUBJECT_TO_ENFORCEMENT_DETAILS
 
+from untils.sql_data import TYC_DATA
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -136,25 +138,24 @@ def get_person_subject_to_enforcement_info(info_id, company_name, tyc_id, busine
 
 
 def main():
-    # data_list = get_company_230420_name()
-    data_list = get_person_subject_to_enforcement_id()
+    mq = MysqlPipelinePublic()
+    data_list = mq.select_sql(
+        "t_zx_history_person_subject_to_enforcement", ["id", "company_name", "tyc_id", "businessId"], {"1": "1"}
+    )
     # data_list=get_company_wechat_name()
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
-        businessId = data[3]
-
+        info_id = data.get("id")
+        company_name = data.get("company_name")
+        tyc_id = data.get("tyc_id")
+        businessId = data.get("businessId")
         logger.warning("当前企业名称为-------%s" % company_name)
         items = get_person_subject_to_enforcement_info(info_id, company_name, tyc_id, businessId)
         try:
-            mq = MysqlPipeline()
             for item in items:
-                mq.insert_into_person_subject_to_enforcement_details_info(item)
-            mq.close()
-
+                mq.insert_sql("t_zx_history_person_subject_to_enforcement_details", item)
         except Exception as e:
             logger.debug(e)
+    mq.close()
 
 
 if __name__ == "__main__":

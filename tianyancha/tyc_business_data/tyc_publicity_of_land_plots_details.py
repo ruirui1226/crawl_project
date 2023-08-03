@@ -92,7 +92,7 @@ def get_publicity_of_land_plots_info(info_id, company_name, tyc_id, businessId):
         url = PUBLICITY_OF_LAND_PLOtS_DETAILS.format(businessId)
         res = requests.get(url=url, headers=headers, verify=False).text
         res_json = json.loads(res)
-        create_json(info_id, tyc_id, company_name, res_json)
+        # create_json(info_id, tyc_id, company_name, res_json)
         items = []
         data = res_json["data"]
         item = {
@@ -116,14 +116,14 @@ def get_publicity_of_land_plots_info(info_id, company_name, tyc_id, businessId):
             "organizeLocation": data.get("organizeLocation", ""),
             "projectName": data.get("projectName", ""),
             "publicationDate": data.get("publicationDate", ""),
-            "landuserClean": str(data.get("publicationDate", "")).replace("'",'"')
+            "landuserClean": str(data.get("publicationDate", "")).replace("'", '"')
             if data.get("landuserClean") is not None
             else "",
-            "landuserCleanApp": str(data.get("landuserCleanApp", "")).replace("'",'"')
+            "landuserCleanApp": str(data.get("landuserCleanApp", "")).replace("'", '"')
             if data.get("landuserCleanApp") is not None
             else "",
             "company_name": company_name,
-            "businessId":businessId,
+            "businessId": businessId,
             "tyc_id": tyc_id,
             "create_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(time.time()))),
         }
@@ -136,21 +136,21 @@ def get_publicity_of_land_plots_info(info_id, company_name, tyc_id, businessId):
 
 
 def main():
-    # data_list = get_company_230420_name()
-    data_list = get_publicity_of_land_plots_detailes_id()
+    mq = MysqlPipelinePublic()
+    data_list = mq.select_sql(
+        "t_zx_publicity_of_land_plots", ["id", "company_name", "tyc_id", "businessId"], {"1": "1"}
+    )
     # data_list=get_company_wechat_name()
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
-        businessId = data[3]
-
+        info_id = data.get("id")
+        company_name = data.get("company_name")
+        tyc_id = data.get("tyc_id")
+        businessId = data.get("businessId")
         logger.warning("当前企业名称为-------%s" % company_name)
         items = get_publicity_of_land_plots_info(info_id, company_name, tyc_id, businessId)
         try:
-            mq = MysqlPipeline()
             for item in items:
-                mq.insert_into_publicity_of_land_plots_details_info(item)
+                mq.insert_sql("t_zx_publicity_of_land_plots_details", item)
             mq.close()
 
         except Exception as e:

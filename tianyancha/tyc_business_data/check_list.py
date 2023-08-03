@@ -15,9 +15,10 @@ import requests
 from urllib3 import disable_warnings
 from urllib3.exceptions import InsecureRequestWarning
 
-from tianyancha.conf.env import X_AUTH_TOKEN
+# from tianyancha.conf.env import X_AUTH_TOKEN
 from untils.pysql import *
 from conf.env import *
+from untils.sql_data import TYC_DATA
 
 disable_warnings(InsecureRequestWarning)
 
@@ -135,7 +136,7 @@ def get_bond_info(pInfoId, pCompanyName, pTycId, pPageNum=1):
     logger.success(iRes)
     iResut = iRes["data"]
     if iResut is not None:
-        create_json(pCompanyName, iRes)
+        # create_json(pCompanyName, iRes)
         iItems = []
         for eInfo in iRes["data"]["items"]:
             iItem = {
@@ -157,11 +158,12 @@ def get_bond_info(pInfoId, pCompanyName, pTycId, pPageNum=1):
 
 
 def main():
-    iDataList = get_company_230420_name()
-    for eData in iDataList:
-        info_id = eData[0]
-        company_name = eData[1]
-        tyc_id = eData[2]
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
+    for data in data_list:
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         iTotalPage = get_total_page(pTycId=tyc_id, pCompanyName=company_name)
         logger.info(f"iTotalPage={iTotalPage}")
         if iTotalPage is not None:
@@ -176,7 +178,7 @@ def main():
                     mq = MysqlPipelinePublic()
                     for item in iItems:
                         mq.insert_sql("t_zx_company_check_list_info_new", item)
-                    mq.close()
+    mq.close()
 
 
 if __name__ == "__main__":

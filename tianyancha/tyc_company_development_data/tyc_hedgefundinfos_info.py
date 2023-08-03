@@ -24,7 +24,9 @@ try:
 except:
     from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+    from untils.sql_data import TYC_DATA
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 def create_json(info_id, tyc_id, company_name, res_json):
@@ -114,13 +116,12 @@ def get_Trademark_detail_info(tyc_hi, Authorization, duid, info_id, deviceID, x_
 
 
 def main():
-    data_list = get_company_230329_name()
-    # data_list=get_company_wechat_name()
     mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         logger.warning("当前企业名称为%s" % company_name)
         if conn.sismember("tyc_get_hedgefundinfos_info", tyc_id):
             logger.debug("{}=======>数据已经采集，无需再次采集".format(tyc_id))
@@ -144,6 +145,7 @@ def main():
         if item:
             mq.insert_sql("t_zx_company_hedgefundinfos_info", item)
             conn.sadd("tyc_get_hedgefundinfos_info", tyc_id)
+    mq.close()
 
 
 if __name__ == "__main__":

@@ -84,8 +84,8 @@ SPECIAL_CLOSESPIDER_TIMEOUT = 1000
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    # "bid_scrapy_project.pipelines.DupefilterPipeline": 288,  # 过滤列表页直取详情数据
-    "bid_scrapy_project.pipelines.BidScrapyProjectPipeline": 300,  # 线下测试使用,正式环境关闭
+    "bid_scrapy_project.pipelines.DupefilterPipeline": 288,  # 过滤列表页直取详情数据
+    # "bid_scrapy_project.pipelines.BidScrapyProjectPipeline": 300,  # 线下测试使用,正式环境关闭
     # 'bid_scrapy_project.pipelines.KafkaPipeline': 303, # kafka启动卡关,正式环境开启
     # 'crawlab.pipelines.CrawlabMongoPipeline': 888, # crawlab
 }
@@ -141,7 +141,7 @@ REDIS_PARAMS = {"db": 1, "password": REDIS_PWD}
 # 本地mysql
 MYSQL_HOST = "127.0.0.1"
 MYSQL_USER = "root"
-MYSQL_PASSWORD = "123456"
+MYSQL_PASSWORD = "root"
 MYSQL_PORT = 3306
 MYSQL_DBNAME = "bid_project"
 MYSQL_TABLE_NAME = "t_zx_bid_crawl_info"
@@ -150,8 +150,8 @@ MYSQL_TABLE_NAME_NEW = "t_zx_bid_info"
 
 
 # 线上kafka相关配置
-# KAFKA_IP_PORT = ["10.67.78.132:9092"]
-# KAFKA_TOPIC_NAME = 'bid_info' # 线上使用，测试不要开启
+KAFKA_IP_PORT = ["10.67.78.132:9092"]
+KAFKA_TOPIC_NAME = 'bid_info' # 线上使用，测试不要开启
 
 # 本地kafka相关配置
 # KAFKA_IP_PORT = ["127.0.0.1:9092"]
@@ -159,8 +159,8 @@ MYSQL_TABLE_NAME_NEW = "t_zx_bid_info"
 
 
 # scrapy-redis 去重相关配置
-# DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
-# SCHEDULER = "scrapy_redis.scheduler.Scheduler"
-# SCHEDULER_QUEUE_KEY = "%(spider)s:requests"
-# SCHEDULER_DUPEFILTER_KEY = "%(spider)s:dupefilter"
-# SCHEDULER_PERSIST = True
+DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+SCHEDULER_QUEUE_KEY = "%(spider)s:requests"
+SCHEDULER_DUPEFILTER_KEY = "%(spider)s:dupefilter"
+SCHEDULER_PERSIST = True

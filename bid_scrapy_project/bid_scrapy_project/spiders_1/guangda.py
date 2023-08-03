@@ -65,7 +65,10 @@ class guangdaSpider(scrapy.Spider):
         tabName = kwargs["tabName"]
         searchDate = kwargs["searchDate"]
         res = pq(response.text)
-        pages = res('div[class="pages"] label').eq(0).text()
+        try:
+            pages = res('div[class="pages"] label').eq(0).text()
+        except:
+            pages = 1
         for i in range(1, int(pages) + 1):
             yield scrapy.Request(
                 url=f"https://zcpt.cebenvironment.com.cn/cms/category/iframe.html?searchDate={searchDate}&dates=0&categoryId={categoryId}&tabName={tabName}&precise=&status=&tenderno=&goSearch=&tenderMethod=&page={i}",

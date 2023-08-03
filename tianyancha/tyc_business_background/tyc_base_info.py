@@ -21,6 +21,7 @@ from tianyancha.untils.redis_conn import conn
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from tianyancha.untils.urls import BASIC_INFO
+from untils.sql_data import TYC_DATA
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -193,11 +194,12 @@ def get_base_info(info_id, company_name, tyc_id, tyc_hi, Authorization, duid, de
 
 
 def main():
-    data_list = get_company_230420_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         pageNum = 1
 
         ex = conn.sadd("tyc_id", tyc_id)
@@ -210,22 +212,17 @@ def main():
             deviceID = data["data"]["deviceID"]
             x_auth_token = data["data"]["x_auth_token"]
             item = get_base_info(info_id, company_name, tyc_id, tyc_hi, Authorization, duid, deviceID, x_auth_token)
-
             try:
-                mq = MysqlPipeline()
-
-                mq.insert_into_company_base_info(item)
+                mq.insert_sql("t_zx_company_base_info", item)
                 logger.info("数据 %s 插入成功" % item)
-                mq.close()
-
             except Exception as e:
                 logger.debug(e)
             else:
                 pass
-
         else:
             logger.debug("%s---------数据已经采集，无需再次采集" % tyc_id)
             pass
+    mq.close()
 
 
 if __name__ == "__main__":

@@ -21,6 +21,7 @@ from untils.pysql import *
 from conf.env import *
 import uuid
 
+from untils.sql_data import TYC_DATA
 
 disable_warnings(InsecureRequestWarning)
 
@@ -154,7 +155,7 @@ def get_supply_info(info_id, company_name, tyc_id, pageNum):
         logger.debug(res)
 
         res_json = json.loads(res)
-        create_json(pageNum, info_id, tyc_id, company_name, res_json)
+        # create_json(pageNum, info_id, tyc_id, company_name, res_json)
 
         items = []
         for supplyl_info in res_json["data"]["pageBean"]["result"]:
@@ -191,13 +192,14 @@ def get_supply_info(info_id, company_name, tyc_id, pageNum):
 
 
 def main():
-    data_list = get_company_230420_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         pageNum = 1
-        ex = conn.sadd("gys_id", tyc_id)
+        ex = conn.sadd("tyc_gongyingshang_list_info.py", tyc_id)
         if ex == 1:
             logger.warning("当前企业名称为%s" % company_name)
             data = get_authoriaztion(info_id, company_name, tyc_id, pageNum)
@@ -214,21 +216,17 @@ def main():
                 for pageNum in range(1, int(pages_total) + 1):
                     items = get_supply_info(info_id, company_name, tyc_id, pageNum)
                     try:
-                        mq = MysqlPipeline()
                         for item in items:
-                            mq.insert_into_company_supply_info(item)
+                            mq.insert_sql("t_zx_company_supply_info", item)
                             logger.info("数据 %s 插入成功" % item)
-                        mq.close()
-
                     except Exception as e:
                         logger.debug(e)
-
             else:
                 pass
-
         else:
             logger.debug("%s---------数据已经采集，无需再次采集" % tyc_id)
             pass
+    mq.close()
 
 
 if __name__ == "__main__":

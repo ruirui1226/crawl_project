@@ -11,12 +11,14 @@ import datetime
 import time
 from io import StringIO
 
-import pandas as pd
+# import pandas as pd
 import scrapy
 from lxml import etree
 
 from bid_scrapy_project.common.common import get_md5
 from bid_scrapy_project.items import BidScrapyProjectItem, GovernmentProcurementItem
+
+from bid_scrapy_project.common.common import format_time
 
 
 class GgzyjyNmgSpider(scrapy.Spider):
@@ -24,12 +26,13 @@ class GgzyjyNmgSpider(scrapy.Spider):
     start_urls = 'http://www.zcbidding.com/portal/jyxx?type=zbgg&flag=jyxx'
     website_name = '采招云电子招投标交易平台'
     website_url = 'http://www.zcbidding.com'
-    type_codes = [{"data-val": 'zbgg', "type": '招标公告'},
+    type_codes = [
+                # {"data-val": 'zbgg', "type": '招标公告'},
                 {"data-val": 'bggg', "type": '变更公告'},
-                {"data-val": 'zbgs', "type": '中标公示'},
-                {"data-val": 'zbggs', "type": '中标公告'},
-                {"data-val": 'dycq', "type": '答疑澄清'},
-                {"data-val": 'lbgg', "type": '流标公告'},
+                # {"data-val": 'zbgs', "type": '中标公示'},
+                # {"data-val": 'zbggs', "type": '中标公告'},
+                # {"data-val": 'dycq', "type": '答疑澄清'},
+                # {"data-val": 'lbgg', "type": '流标公告'},
              ]
     def start_requests(self):
         for page in range(1, 4):
@@ -65,7 +68,7 @@ class GgzyjyNmgSpider(scrapy.Spider):
                 tree = etree.parse(StringIO(detail_htlm), etree.HTMLParser())
                 detail_text = ' '.join(tree.xpath('//text()')).strip()
                 bid_public_time = list_item.get('noticeSendTime')
-                po_public_time = self.normalize_datetime(bid_public_time)
+                po_public_time = format_time(bid_public_time)
                 url = 'http://www.zcbidding.com/portal/ggXq?id=' + str(list_item.get('id'))
                 po_id = get_md5(url)
                 item = GovernmentProcurementItem()
@@ -86,17 +89,17 @@ class GgzyjyNmgSpider(scrapy.Spider):
                 yield item
         else:
             pass
-    def normalize_datetime(self, time_str):
-        try:
-            datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d %H:%M:%S")
-        except ValueError:
-            try:
-                datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d")
-            except ValueError:
-                try:
-                    datetime_obj = pd.to_datetime(time_str, format="%m/%d/%Y %I:%M %p")
-                except ValueError:
-                    return None
-
-        normalized_time_str = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
-        return normalized_time_str
+    # def normalize_datetime(self, time_str):
+    #     try:
+    #         datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d %H:%M:%S")
+    #     except ValueError:
+    #         try:
+    #             datetime_obj = pd.to_datetime(time_str, format="%Y-%m-%d")
+    #         except ValueError:
+    #             try:
+    #                 datetime_obj = pd.to_datetime(time_str, format="%m/%d/%Y %I:%M %p")
+    #             except ValueError:
+    #                 return None
+    #
+    #     normalized_time_str = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
+    #     return normalized_time_str

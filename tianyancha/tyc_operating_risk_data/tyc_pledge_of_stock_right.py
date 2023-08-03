@@ -26,6 +26,8 @@ import uuid
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+from untils.sql_data import TYC_DATA
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -102,6 +104,8 @@ def get_pledge_of_stock_right_page(
 
             if pages_total:
                 return pages_total
+        elif len(res_json["data"]) == 0:
+            logger.debug("%s没有商标信息" % company_name)
         elif int(res_json["data"]["count"]) > 0:
             pages_total = math.ceil(int(res_json["data"]["count"]) / 20)
             if pages_total:
@@ -202,12 +206,12 @@ def get_pledge_of_stock_right_info(info_id, company_name, tyc_id, pageNum):
 
 
 def main():
-    data_list = get_company_230420_name()
-    # data_list=get_company_wechat_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         initial_pageNum = 1
         ex = conn.sadd("tyc_pledge_of_stock_right", tyc_id)
         logger.warning("当前企业ID为-------%s" % tyc_id)
@@ -227,11 +231,8 @@ def main():
                 for pageNum in range(1, int(pages_total) + 1):
                     items = get_pledge_of_stock_right_info(info_id, company_name, tyc_id, pageNum)
                     try:
-                        mq = MysqlPipelinePublic()
                         for item in items:
                             mq.insert_sql("t_zx_pledge_of_stock_right", item)
-                        mq.close()
-
                     except Exception as e:
                         logger.debug(e)
             else:
@@ -240,6 +241,7 @@ def main():
             logger.debug("%s======>数据已经采集，无需再次采集" % tyc_id)
             pass
         # delete_to_mysql_wechat_main(info_id,company_name)
+    mq.close()
 
 
 if __name__ == "__main__":

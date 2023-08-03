@@ -154,7 +154,7 @@ def get_investments_abroad_info(info_id, company_name, tyc_id, businessid):
 
         logger.debug(res)
         res_json = json.loads(res)
-        create_json(1, info_id, tyc_id, company_name, res_json)
+        # create_json(1, info_id, tyc_id, company_name, res_json)
         items = []
         item = {
             "info_id": info_id,

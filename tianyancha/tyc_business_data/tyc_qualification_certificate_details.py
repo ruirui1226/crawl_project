@@ -93,13 +93,13 @@ def get_qualification_certificate_details_info(info_id, company_name, tyc_id, bu
         url = QUALIFICATION_CERTIFICATE_DETAIls.format(businessId)
         res = requests.get(url=url, headers=headers, verify=False).text
         res_json = json.loads(res)
-        create_json(info_id, tyc_id, company_name, res_json)
+        # create_json(info_id, tyc_id, company_name, res_json)
         items = []
         detail = res_json["data"]["detail"]
         item = {
             # "id": businessId,
             "info_id": str(info_id),
-            "detail": str(detail).replace("'",'"'),
+            "detail": str(detail).replace("'", '"'),
             "company_name": company_name,
             "tyc_id": tyc_id,
             "create_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(time.time()))),
@@ -113,19 +113,20 @@ def get_qualification_certificate_details_info(info_id, company_name, tyc_id, bu
 
 
 def main():
-    # data_list = get_company_230420_name_detail()
-    data_list = get_qualification_certificate_id()
+    mq = MysqlPipelinePublic()
+    data_list = mq.select_sql(
+        "t_zx_qualification_certificate", ["id", "company_name", "tyc_id", "businessId"], {"1": "1"}
+    )
     # data_list=get_company_wechat_name()
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
-        businessId = data[3]
+        info_id = data.get("id")
+        company_name = data.get("company_name")
+        tyc_id = data.get("tyc_id")
+        businessId = data.get("businessId")
 
         logger.warning("当前企业名称为-------%s" % company_name)
         items = get_qualification_certificate_details_info(info_id, company_name, tyc_id, businessId)
         try:
-            mq = MysqlPipelinePublic()
             for item in items:
                 mq.insert_sql("t_zx_qualification_certificate_details", item)
             mq.close()

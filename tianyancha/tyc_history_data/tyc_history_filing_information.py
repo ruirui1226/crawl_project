@@ -23,6 +23,8 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from tianyancha.untils.pysql import MysqlPipeline
 
+from untils.sql_data import TYC_DATA
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -186,12 +188,12 @@ def get_notice_of_court_session_info(info_id, company_name, tyc_id, pageNum):
 
 
 def main():
-    data_list = get_company_230420_name()
-    # data_list=get_company_wechat_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         pageNum = 1
 
         logger.warning("当前企业名称为%s" % company_name)
@@ -209,16 +211,14 @@ def main():
             for pageNum in range(1, int(pages_total) + 1):
                 items = get_notice_of_court_session_info(info_id, company_name, tyc_id, pageNum)
                 try:
-                    mq = MysqlPipeline()
                     for item in items:
-                        mq.insert_into_history_filing_information(item)
-                    mq.close()
-
+                        mq.insert_sql("t_zx_tyc_history_filing_information", item)
                 except Exception as e:
                     logger.debug(e)
         else:
             pass
         # delete_to_mysql_wechat_main(info_id,company_name)
+    mq.close()
 
 
 if __name__ == "__main__":

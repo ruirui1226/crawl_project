@@ -7,6 +7,7 @@
 # pip install pycryptodome
 import hashlib
 
+import pyDes
 from Crypto.Cipher import AES
 import base64
 import binascii
@@ -207,20 +208,62 @@ class AEScryptor:
         mData = MData(self.__stripPaddingData(data), characterSet=self.characterSet)
         return mData
 
+from pyDes import des, CBC, PAD_PKCS5, ECB
+#pip install pyDes
+
+class Descryptor():
+    import binascii
+    # 秘钥
+    # def __init__(self):
+        # self.KEY = key
+
+    def des_encrypt(self,s, key, type, padmode,iv=None):
+        """
+        DES 加密
+        :param s: 原始字符串
+        :return: 加密后字符串，16进制
+        """
+        secret_key = key
+        # iv = secret_key type:CBC ECB
+        # padmode:PAD_PKCS5   PAD_PKCS7
+        k = des(secret_key, type, iv, pad=None, padmode=padmode)
+        en = k.encrypt(s, padmode=padmode)
+        return MData(en)
+
+    def des_descrypt(self,s, key,type, padmode):
+        """
+        DES 解密
+        :param s: 加密后的字符串，16进制
+        :return:  解密后的字符串
+        """
+        # secret_key = self.KEY
+        secret_key = key[:8]
+        iv = key[8:]
+        k = des(secret_key, type, iv, pad=None, padmode=padmode)
+        de = k.decrypt(base64.b64decode(s), padmode=padmode)
+        # print(de.decode(encoding='GB2312',errors='strict'))
+        # print(str(de, encoding="gb18030"))
+        ddee = de.decode()
+        return MData(ddee)
 
 if __name__ == "__main__":
-    key = b"BE45D593014E4A4EB4449737660876CE"
-    iv = b"A8909931867B0425"
-    aes = AEScryptor(key, AES.MODE_CBC, iv, paddingMode="PKCS7Padding", characterSet="utf-8", isHeskey_iv=True)
-
-    data = "好好学习"
+    key = b"dc93ac38"
+    # key = binascii.b2a_hex(key).decode()
+    # iv = b"A8909931867B0425"
+    aes = AEScryptor(key, AES.MODE_ECB, paddingMode="PKCS7Padding", characterSet="utf-8", isHeskey_iv=True)
+    #
+    data = "777FA8F2C4A550736DAD88E2FC309CC0A713C7B51FD2BEDA2B872B4DAC1B86A9D409722C6CAD3B8FD943BD160B1A20B0396709DBD8FCB47B3BA3A58B29805380"
     # rData = aes.encryptFromString(data)
-    # print("密文：", rData.toBase64())
-    rData = "N1jfMuHUNZzAwf7B5RzFD1GKX36sb7XvQRsSMfdmdOx/1WX3k3GOQMhghQvUUaHApXvAsRE+irIPLlzLawwKZYYGY/9lGuRG7gmARjXOO61EpzRaTleeC8Rd6yMXxhPiMnUAztdDWfV+kT1F6urGfA97sKFXxcZ1vloozlCxvWoHEIeREd03j9d7Xn7ViK5iEN5EFMUnBAmSoXZMg6K9pVZsiEpWytwi/vLM2ljd2wRFCbJTmxtPxG5EAtuCTp0VfyxVzDa0RAzKs7JeXnECQQjs8Kkoe9NMdVpd8sU8u7jWdkG/V6H2cpWZFiNiGy5QcxRUNbJY/d2lJSWU88QUz+i0HIZCEa6KePW5uxpZv72laazvjC7Ff/EcuVOYnAWtmWT0JvzeBaQi935if0928+aBN43KVvAgL/wPq4cdS7t/hAIyHcbUbRvQ9lhg6nRD5hfVglCnYRqRslhPDlCW0kGCybhz2Qaj6NaefekJUNW2laiMsEoQWwQuU3qF+D8izmJj7PMhQ/YL/gtlkXyv2rS5bxmx1Hs2jm4jgw28LPPwL5L/S7Q7D2eZSVY6qMWPWZnbrcJm/Hp4pmrzIQcNTMxJFLcE36SQE1VbP9r2SSK3klOlGunv+6szD1Hvh+IS+BE1LaGgPgnIeoLLMub1wXfidMdKAfayouxY9pGbda9v6ADOrPX7tczDpEzWMNAH2onsEpjPK0tU/hc2/ywSFkXUjFUMh6HUcslwfYnT1HoleYO1PlWYPnKwuB9a2mhH+GWSaIX8A5PgPSColS5EZzrQd2YdRZOdDoVm/9UVnv2PQCOKjHSFHG+ZlofEweKaVJd2wkKAyJlGv4ub5tp/1AkF2KpfT9bxHZhEXr5UbwiuXTtXc0gWu5VmWhxRZctdHN8IHFjNmwdTT9wmarcMTRSxaaEDDTrWj3G7xyzbRRjfduCPZZLf15INOIdfVuX1RklQ7CSUdlsKvcATrWiPmWbRIHCZadGH3OnmyOu6FknU0zTRlK4wkr8rjyTMM8xh7U99Vos/av4e5huWni4MSs8YoifS3HVTX6N10KJe/+L2ERTCGjJ8YqLHz36PhC3PmlAPTv66Nrh9mzbKwowxtzZhHScqaiNvL2Y4NepPzMhAzHGZL5BKd5h4Sc4YkrgYUEHayXWP/IcGiOz4t/WU4XDkqgxAvOV4ukGU/txlq733UMZDqGGp541EqZ+48l/LYpg8W7UVXQqAAJGFm2X44PIXrQkIargzWyTXAaoNgkIOjnU6M4iU44H/Mrq+JTwsKyL2E+hO/y8T5klcogNhua3ZWZbJZPZn9ZLIRnzWtLNAJD8xNuqX59n8GlBUg/ZL03H8IOONm0Uc1LjdWYm49fk7bF/Ti2905V7KmFoHikHYAGl1Dwc/yqf7lkXb09+3KwIGq/pk6d/fof4oMP34eVgmmRzPs2blj4Z/AFdRKQt5Zgvlgr+X6amLFqsbvtH8pArkC3jCbnYpyJ1Vkdd1TQcLSjv1hoz540Nme3UqiShNUVVlX24TynOhtEJ1Odt1YJNeeMACQGB8GSOQ5KwkZeVINo3yzDHRPT517MzXrcl2JKMobouq8CoYcEugKiqKopxJV7or59yp0zEITNDSFVbu2hVdD31/q6UY02Y02QAaFPXpzvspQD9eqVWG4uwiLbqZB7QwNb/y5V23s+7UVzqZmB/JidC19KutzLCDVKIXkmeGxEO0pFob3fXZsDReL7gfJZMGi22+EZwfJQ2ccySsrAmySBoPJfWXvXWDbxCWJnOJUq5ycDdxvxcGwhkgPDSMBLtUX1h+X6n4sI1fw3jQasgeuCgccaQ+aDhsYE9uOxaMT8bnCXm/X2jXdANjKl+x4kTcGaKV3ieX/1TboYNXHSAsn09i9jDcdd6vqMzi/M+aRd6ybRerqWyQ+pezqDQdOxoMEzNPaf1ueSH2LUAl4xvuotiIJNZaMnLPaUI="
-    rData = aes.decryptFromBase64(rData)
-    print("明文：", rData)
-    print("明文：", type(rData.data))
+    # print("密文：", rData.toHexStr())
+    # rData = "N1jfMuHUNZzAwf7B5RzFD1GKX36sb7XvQRsSMfdmdOx/1WX3k3GOQMhghQvUUaHApXvAsRE+irIPLlzLawwKZYYGY/9lGuRG7gmARjXOO61EpzRaTleeC8Rd6yMXxhPiMnUAztdDWfV+kT1F6urGfA97sKFXxcZ1vloozlCxvWoHEIeREd03j9d7Xn7ViK5iEN5EFMUnBAmSoXZMg6K9pVZsiEpWytwi/vLM2ljd2wRFCbJTmxtPxG5EAtuCTp0VfyxVzDa0RAzKs7JeXnECQQjs8Kkoe9NMdVpd8sU8u7jWdkG/V6H2cpWZFiNiGy5QcxRUNbJY/d2lJSWU88QUz+i0HIZCEa6KePW5uxpZv72laazvjC7Ff/EcuVOYnAWtmWT0JvzeBaQi935if0928+aBN43KVvAgL/wPq4cdS7t/hAIyHcbUbRvQ9lhg6nRD5hfVglCnYRqRslhPDlCW0kGCybhz2Qaj6NaefekJUNW2laiMsEoQWwQuU3qF+D8izmJj7PMhQ/YL/gtlkXyv2rS5bxmx1Hs2jm4jgw28LPPwL5L/S7Q7D2eZSVY6qMWPWZnbrcJm/Hp4pmrzIQcNTMxJFLcE36SQE1VbP9r2SSK3klOlGunv+6szD1Hvh+IS+BE1LaGgPgnIeoLLMub1wXfidMdKAfayouxY9pGbda9v6ADOrPX7tczDpEzWMNAH2onsEpjPK0tU/hc2/ywSFkXUjFUMh6HUcslwfYnT1HoleYO1PlWYPnKwuB9a2mhH+GWSaIX8A5PgPSColS5EZzrQd2YdRZOdDoVm/9UVnv2PQCOKjHSFHG+ZlofEweKaVJd2wkKAyJlGv4ub5tp/1AkF2KpfT9bxHZhEXr5UbwiuXTtXc0gWu5VmWhxRZctdHN8IHFjNmwdTT9wmarcMTRSxaaEDDTrWj3G7xyzbRRjfduCPZZLf15INOIdfVuX1RklQ7CSUdlsKvcATrWiPmWbRIHCZadGH3OnmyOu6FknU0zTRlK4wkr8rjyTMM8xh7U99Vos/av4e5huWni4MSs8YoifS3HVTX6N10KJe/+L2ERTCGjJ8YqLHz36PhC3PmlAPTv66Nrh9mzbKwowxtzZhHScqaiNvL2Y4NepPzMhAzHGZL5BKd5h4Sc4YkrgYUEHayXWP/IcGiOz4t/WU4XDkqgxAvOV4ukGU/txlq733UMZDqGGp541EqZ+48l/LYpg8W7UVXQqAAJGFm2X44PIXrQkIargzWyTXAaoNgkIOjnU6M4iU44H/Mrq+JTwsKyL2E+hO/y8T5klcogNhua3ZWZbJZPZn9ZLIRnzWtLNAJD8xNuqX59n8GlBUg/ZL03H8IOONm0Uc1LjdWYm49fk7bF/Ti2905V7KmFoHikHYAGl1Dwc/yqf7lkXb09+3KwIGq/pk6d/fof4oMP34eVgmmRzPs2blj4Z/AFdRKQt5Zgvlgr+X6amLFqsbvtH8pArkC3jCbnYpyJ1Vkdd1TQcLSjv1hoz540Nme3UqiShNUVVlX24TynOhtEJ1Odt1YJNeeMACQGB8GSOQ5KwkZeVINo3yzDHRPT517MzXrcl2JKMobouq8CoYcEugKiqKopxJV7or59yp0zEITNDSFVbu2hVdD31/q6UY02Y02QAaFPXpzvspQD9eqVWG4uwiLbqZB7QwNb/y5V23s+7UVzqZmB/JidC19KutzLCDVKIXkmeGxEO0pFob3fXZsDReL7gfJZMGi22+EZwfJQ2ccySsrAmySBoPJfWXvXWDbxCWJnOJUq5ycDdxvxcGwhkgPDSMBLtUX1h+X6n4sI1fw3jQasgeuCgccaQ+aDhsYE9uOxaMT8bnCXm/X2jXdANjKl+x4kTcGaKV3ieX/1TboYNXHSAsn09i9jDcdd6vqMzi/M+aRd6ybRerqWyQ+pezqDQdOxoMEzNPaf1ueSH2LUAl4xvuotiIJNZaMnLPaUI="
+    # rData = aes.decryptFromBase64(rData)
+    # print("明文：", rData)
+    # print("明文：", type(rData.data))
 
     ##md5
     # ll = get_md5("3637CB36B2E54A72A7002978D0506CDFBeginTime2022-12-27 00:00:00createTime[]EndTime2023-06-27 23:59:59GGTYPE1KINDGCJSpageNo1pageSize40PROTYPEA02timeType6total960ts1687845604882")
     # print(ll)
+    ##++++++++des+++++++
+    datas = Descryptor().des_encrypt(data, key, ECB, pyDes.PAD_PKCS5)
+    print(datas.toHexStr())
+    # print(bytes(key))

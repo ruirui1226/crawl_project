@@ -27,7 +27,9 @@ try:
 except:
     from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+    from untils.sql_data import TYC_DATA
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 def create_json(pageNum, info_id, tyc_id, company_name, res_json):
@@ -199,12 +201,12 @@ def get_Copyright_Of_Works_info(info_id, company_name, tyc_id, pageNum):
 
 
 def main():
-    data_list = get_company_230329_name()
-    # data_list=get_company_wechat_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         initial_pageNum = 1
         logger.warning("当前企业名称为%s" % company_name)
         if conn.sismember("tyc_copyright_of_works", tyc_id):
@@ -229,7 +231,6 @@ def main():
             initial_pageNum,
         )
         if pages_total:
-            mq = MysqlPipelinePublic()
             for pageNum in range(1, int(pages_total) + 1):
                 items = get_Copyright_Of_Works_info(info_id, company_name, tyc_id, pageNum)
                 # try:
@@ -245,11 +246,11 @@ def main():
                     # conn.sadd("tyc_copyright_of_works_det_req", json.dumps(req_data, ensure_ascii=False))
                 # except Exception as e:
                 #     logger.error(e)
-            mq.close()
         else:
             pass
         conn.sadd("tyc_copyright_of_works", tyc_id)
         # delete_to_mysql_wechat_main(info_id,company_name)
+    mq.close()
 
 
 if __name__ == "__main__":

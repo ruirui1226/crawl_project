@@ -17,6 +17,9 @@ from untils.pysql import *
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+
+from untils.sql_data import TYC_DATA
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -145,7 +148,7 @@ def get_bid_info(info_id, company_name, tyc_id, pageNum):
         }
         res = requests.get(url=url, headers=headers, verify=False).text
         res_json = json.loads(res)
-        create_json(pageNum, info_id, tyc_id, company_name, res_json)
+        # create_json(pageNum, info_id, tyc_id, company_name, res_json)
         items = []
 
         for bid_info in res_json["data"]["items"]:
@@ -188,11 +191,12 @@ def get_bid_info(info_id, company_name, tyc_id, pageNum):
 
 
 def main():
-    data_list = get_company_230420_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         pageNum = 1
 
         data = get_authoriaztion(info_id, company_name, tyc_id, pageNum)
@@ -214,14 +218,13 @@ def main():
                     #     mq.insert_into_bid_info(item)
                     #     logger.info("数据 %s 插入成功" % item)
                     # mq.close()
-                    mq = MysqlPipelinePublic()
                     for item in items:
                         mq.insert_sql("t_zx_company_bid_info", item)
-                    mq.close()
                 except Exception as e:
                     logger.debug(e)
         else:
             pass
+    mq.close()
 
 
 if __name__ == "__main__":

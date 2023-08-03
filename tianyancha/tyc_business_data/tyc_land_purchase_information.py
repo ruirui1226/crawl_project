@@ -17,6 +17,8 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from untils.redis_conn import conn
 
+from untils.sql_data import TYC_DATA
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -166,11 +168,12 @@ def get_land_purchase_info(pageNum, info_id, company_name, tyc_id):
 
 
 def main():
-    data_list = get_company_230420_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
-        info_id = data[0]
-        company_name = data[1]
-        tyc_id = data[2]
+        info_id = data.get("id")
+        company_name = data.get("co_name")
+        tyc_id = data.get("co_id")
         pageNum = 1
         ex = conn.sismember("tyc_land_purchase", tyc_id)
         if ex:
@@ -193,7 +196,6 @@ def main():
                     items = get_land_purchase_info(pageNum, info_id, company_name, tyc_id)
                     try:
                         pass
-                        mq = MysqlPipelinePublic()
                         for item in items:
                             mq.insert_sql("t_zx_tyc_land_purchase_information", item)
                             logger.info("数据 %s 插入成功", item)

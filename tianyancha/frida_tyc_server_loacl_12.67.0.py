@@ -91,4 +91,4 @@ async def get_authorzation(item: Item):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app=app, host="0.0.0.0", port=9966)
+    uvicorn.run(app=app, host="0.0.0.0", port=9964)

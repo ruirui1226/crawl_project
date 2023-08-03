@@ -21,6 +21,7 @@ from tianyancha.untils.urls import KEY_PERSONNEL
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from tianyancha.untils.redis_conn import conn
+from untils.sql_data import TYC_DATA
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -186,7 +187,8 @@ def get_Trademark_info(info_id, company_name, tyc_id, pageNum):
 
 
 def main():
-    data_list = get_company_230420_name()
+    mq = MysqlPipelinePublic()
+    data_list = TYC_DATA
     for data in data_list:
         info_id = data[0]
         company_name = data[1]
@@ -207,11 +209,9 @@ def main():
             for pageNum in range(1, int(pages_total) + 1):
                 items = get_Trademark_info(info_id, company_name, tyc_id, pageNum)
                 try:
-                    mq = MysqlPipelinePublic()
                     for item in items:
                         mq.insert_sql("t_zx_company_main_staff_info", item)
                         logger.debug(f"======插入===={item}====")
-                    mq.close()
                 except Exception as e:
                     logger.debug(e)
                 else:
@@ -219,6 +219,7 @@ def main():
         else:
             logger.debug("%s---------数据已经采集，无需再次采集" % tyc_id)
             pass
+    mq.close()
 
 
 if __name__ == "__main__":
