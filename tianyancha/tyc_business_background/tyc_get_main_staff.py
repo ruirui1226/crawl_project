@@ -14,13 +14,13 @@ import os
 import time
 import math
 import uuid
-from tianyancha.untils.pysql import *
+from untils.pysql import *
 
-from tianyancha.untils.urls import KEY_PERSONNEL
+from untils.urls import KEY_PERSONNEL
 
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from tianyancha.untils.redis_conn import conn
+from untils.redis_conn import conn
 from untils.sql_data import TYC_DATA
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)

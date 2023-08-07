@@ -12,17 +12,17 @@ from loguru import logger
 import os
 import time
 import math
-from tianyancha.untils.redis_conn import conn
+from untils.redis_conn import conn
 
 
-from tianyancha.untils.pysql import *
-from tianyancha.conf.env import *
+from untils.pysql import *
+from conf.env import *
 
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import uuid
 
-from tianyancha.untils.urls import HOLDER_INFO
+from untils.urls import HOLDER_INFO
 from untils.sql_data import TYC_DATA
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)

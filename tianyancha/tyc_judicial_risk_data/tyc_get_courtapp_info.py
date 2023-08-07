@@ -8,7 +8,7 @@ import requests
 import json
 import os, time, math
 import urllib3
-from tianyancha.untils.pysql import *
+from untils.pysql import *
 from tyc_judicial_risk_data.tyc_distribute_task import task_distribution
 from untils.redis_conn import r
 from untils.urls import COURTAPP_LIST

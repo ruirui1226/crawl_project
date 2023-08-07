@@ -16,7 +16,7 @@ from loguru import logger
 import os, time, math
 import uuid
 from conf.env import *
-from tianyancha.untils.pysql import *
+from untils.pysql import *
 from tyc_judicial_risk_data.tyc_distribute_task import task_distribution
 from untils.redis_conn import r
 from untils.urls import FINANCIALBLACKLIST_LIST, FINANCIALBLACKLIST_DETAILS

@@ -19,6 +19,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from untils.redis_conn import conn
 
 from untils.sql_data import TYC_DATA
+from untils.urls import PURCHASE_DETAIL
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -42,11 +43,11 @@ def create_json(pageNum, info_id, tyc_id, company_name, res_json):
 def get_authoriaztion(info_id, company_name, tyc_id, pageNum):
     version = "Android 12.67.0"
 
-    url = f"https://api6.tianyancha.com/cloud-business-state/recruitment/list?city=-100&pageSize=10&graphId={tyc_id}&experience=-100&pageNum={pageNum}&startDate=-100"
+    url = PURCHASE_DETAIL.format(tyc_id, pageNum)
     data = {"url": url, "version": version}
 
     r = requests.post("http://127.0.0.1:9964/get_authorzation", data=json.dumps(data))
-    logger.warning(r.text)
+    # logger.warning(r.text)
     data = json.loads(r.text)
     return data
 
@@ -80,7 +81,7 @@ def get_land_purchase_page(info_id, company_name, tyc_id, tyc_hi, Authorization,
             "Host": "api6.tianyancha.com",
             "Accept-Encoding": "gzip",
         }
-        url = f"https://api6.tianyancha.com/cloud-business-state/v3/e/comPurchaseLand/purchaseLandV2?gid={tyc_id}&pageSize=20&pageNum=1"
+        url = PURCHASE_DETAIL.format(tyc_id, 1)
 
         res = requests.get(url, headers=headers, verify=False).text
 
@@ -105,8 +106,7 @@ def get_land_purchase_page(info_id, company_name, tyc_id, tyc_hi, Authorization,
 
 def get_land_purchase_info(pageNum, info_id, company_name, tyc_id):
     try:
-        url = f"https://api6.tianyancha.com/cloud-business-state/v3/e/comPurchaseLand/purchaseLandV2?gid={tyc_id}&pageSize=20&pageNum={pageNum}"
-
+        url = PURCHASE_DETAIL.format(tyc_id, pageNum)
         logger.warning(url)
         data = get_authoriaztion(info_id, company_name, tyc_id, pageNum)
         tyc_hi = data["data"]["tyc_hi"]
@@ -219,15 +219,11 @@ def main():
                 info_id, company_name, tyc_id, tyc_hi, Authorization, duid, deviceID, x_auth_token
             )
             if pages_total:
-                print(company_name)
                 for pageNum in range(1, int(pages_total) + 1):
                     items = get_land_purchase_info(pageNum, info_id, company_name, tyc_id)
                     try:
-                        pass
                         for item in items:
                             mq.insert_sql("t_zx_tyc_land_purchase_information_detail", item)
-                            # mq = MysqlPipeline()
-                            # mq.insert_into_administrative_licensing_detail1(item)
                             logger.info("数据 %s 插入成功" % item)
                     except Exception as e:
                         logger.debug(e)

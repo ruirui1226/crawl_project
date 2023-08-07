@@ -18,6 +18,8 @@ from untils.pysql import *
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+from untils.urls import WEIBO_LIST
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -37,7 +39,9 @@ def create_json(company_name, res_json):
 
 def get_authoriaztion(info_id, company_name, tyc_id, pageNum):
     version = "Android 12.67.0"
-    url = f"https://api6.tianyancha.com/cloud-business-state/weibo/list?pageSize=20&graphId={tyc_id}&pageNum={pageNum}"
+    # url = f"https://api6.tianyancha.com/cloud-business-state/weibo/list?pageSize=20&graphId={tyc_id}&pageNum={pageNum}"
+
+    url = WEIBO_LIST.format(tyc_id, pageNum)
     data = {"url": url, "version": version}
 
     r = requests.post("http://127.0.0.1:9964/get_authorzation", data=json.dumps(data))
@@ -60,7 +64,8 @@ def get_Weibo_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid, d
             "content-type": "application/json",
         }
 
-        url = f"https://api6.tianyancha.com/cloud-business-state/weibo/list?pageSize=20&graphId={tyc_id}&pageNum=1"
+        # url = f"https://api6.tianyancha.com/cloud-business-state/weibo/list?pageSize=20&graphId={tyc_id}&pageNum=1"
+        url = WEIBO_LIST.format(tyc_id, 1)
         # print(url)
         res = requests.get(url=url, headers=headers, verify=False).text
 
@@ -85,7 +90,8 @@ def get_Weibo_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid, d
 
 def get_Weibo_info(info_id, company_name, tyc_id, pageNum):
     try:
-        url = f"https://api6.tianyancha.com/cloud-business-state/weibo/list?pageSize=20&graphId={tyc_id}&pageNum={pageNum}"
+        # url = f"https://api6.tianyancha.com/cloud-business-state/weibo/list?pageSize=20&graphId={tyc_id}&pageNum={pageNum}"
+        url = WEIBO_LIST.format(tyc_id, pageNum)
         logger.warning(url)
         data = get_authoriaztion(info_id, company_name, tyc_id, pageNum)
         tyc_hi = data["data"]["tyc_hi"]
@@ -165,12 +171,11 @@ def main():
                     for item in items:
                         mq.insert_sql("t_zx_company_weibo_info", item)
                         logger.info("数据 %s 插入成功" % item)
-                    mq.close()
                 except Exception as e:
                     logger.debug(e)
         else:
             pass
-
+    mq.close()
 
 if __name__ == "__main__":
     main()

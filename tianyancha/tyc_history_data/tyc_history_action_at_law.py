@@ -13,8 +13,8 @@ from loguru import logger
 import os
 import time
 import math
-from tianyancha.untils.pysql import *
-from tianyancha.conf.env import *
+from untils.pysql import *
+from conf.env import *
 import uuid
 
 # 忽略requests证书警告

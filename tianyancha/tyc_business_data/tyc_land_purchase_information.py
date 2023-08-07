@@ -9,7 +9,7 @@ import json
 from loguru import logger
 import os, time, math
 import uuid
-from tianyancha.conf.env import *
+from conf.env import *
 from untils.pysql import *
 
 # 忽略requests证书警告
@@ -18,6 +18,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from untils.redis_conn import conn
 
 from untils.sql_data import TYC_DATA
+from untils.urls import PURCHASE
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -41,7 +42,7 @@ def create_json(pageNum, info_id, tyc_id, company_name, res_json):
 def get_authoriaztion(info_id, company_name, tyc_id, pageNum):
     version = "Android 12.67.0"
 
-    url = f"https://api6.tianyancha.com/cloud-business-state/recruitment/list?city=-100&pageSize=10&graphId={tyc_id}&experience=-100&pageNum={pageNum}&startDate=-100"
+    url = PURCHASE.format(tyc_id, pageNum)
     data = {"url": url, "version": version}
 
     r = requests.post("http://127.0.0.1:9966/get_authorzation", data=json.dumps(data))
@@ -79,11 +80,9 @@ def get_land_purchase_page(info_id, company_name, tyc_id, tyc_hi, Authorization,
             "Host": "api6.tianyancha.com",
             "Accept-Encoding": "gzip",
         }
-        url = f"https://api6.tianyancha.com/cloud-business-state/v3/e/comPurchaseLand/purchaseLandV2?gid={tyc_id}&pageSize=20&pageNum=1"
+        url = PURCHASE.format(tyc_id, "1")
 
         res = requests.get(url, headers=headers, verify=False).text
-
-        logger.debug(res)
 
         res_json = json.loads(res)
         if "totalRows" in str(res_json["data"]):
@@ -104,8 +103,7 @@ def get_land_purchase_page(info_id, company_name, tyc_id, tyc_hi, Authorization,
 
 def get_land_purchase_info(pageNum, info_id, company_name, tyc_id):
     try:
-        url = f"https://api6.tianyancha.com/cloud-business-state/v3/e/comPurchaseLand/purchaseLandV2?gid={tyc_id}&pageSize=20&pageNum={pageNum}"
-
+        url = PURCHASE.format(tyc_id, pageNum)
         logger.warning(url)
         data = get_authoriaztion(info_id, company_name, tyc_id, pageNum)
         tyc_hi = data["data"]["tyc_hi"]
@@ -195,17 +193,15 @@ def main():
                 for pageNum in range(1, int(pages_total) + 1):
                     items = get_land_purchase_info(pageNum, info_id, company_name, tyc_id)
                     try:
-                        pass
                         for item in items:
                             mq.insert_sql("t_zx_tyc_land_purchase_information", item)
                             logger.info("数据 %s 插入成功", item)
-                        mq.close()
-
                     except Exception as e:
                         logger.debug(e)
             else:
                 pass
         conn.sadd("tyc_land_purchase", tyc_id)
+    mq.close()
 
 
 if __name__ == "__main__":

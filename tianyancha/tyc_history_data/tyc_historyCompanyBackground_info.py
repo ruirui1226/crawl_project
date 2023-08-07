@@ -13,9 +13,9 @@ import json
 from loguru import logger
 import os, time, math
 import uuid
-from tianyancha.conf.env import *
-from tianyancha.untils.pysql import *
-from tianyancha.untils.urls import HISTORY_INDUSTRY_COMMERCE_DATA
+from conf.env import *
+from untils.pysql import *
+from untils.urls import HISTORY_INDUSTRY_COMMERCE_DATA
 
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning

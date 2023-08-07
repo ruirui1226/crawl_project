@@ -183,7 +183,6 @@ def main():
         company_name = data.get("co_name")
         tyc_id = data.get("co_id")
         pageNum = 1
-
         logger.warning("当前企业名称为%s" % company_name)
         if conn.sismember("tyc_get_environmental_penaltie_info", tyc_id):
             logger.debug("{}=======>数据已经采集，无需再次采集".format(tyc_id))

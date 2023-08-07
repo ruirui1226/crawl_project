@@ -10,14 +10,14 @@ import json
 from loguru import logger
 import os, time, math
 import uuid
-from tianyancha.conf.env import *
-from tianyancha.untils.pysql import *
+from conf.env import *
+from untils.pysql import *
 from untils.redis_conn import conn
 
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-from tianyancha.untils.urls import COMPANY_HOLDING
+from untils.urls import COMPANY_HOLDING
 from untils.sql_data import TYC_DATA
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)

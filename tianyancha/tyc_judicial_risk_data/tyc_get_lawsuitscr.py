@@ -9,7 +9,7 @@ import json
 
 import urllib3
 import math
-from tianyancha.untils.pysql import *
+from untils.pysql import *
 from tyc_judicial_risk_data.tyc_distribute_task import task_distribution
 import re
 

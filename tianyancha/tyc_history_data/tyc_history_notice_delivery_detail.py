@@ -13,10 +13,10 @@ from loguru import logger
 import os
 import time
 import math
-from tianyancha.untils.pysql import *
-from tianyancha.conf.env import *
+from untils.pysql import *
+from conf.env import *
 import uuid
-from tianyancha.untils.urls import HISTORICAL_NOTICE_OF_SERVICE, HISTORICAL_NOTICE_OF_SERVICE_DETAIL
+from untils.urls import HISTORICAL_NOTICE_OF_SERVICE, HISTORICAL_NOTICE_OF_SERVICE_DETAIL
 
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning

@@ -15,17 +15,19 @@ import requests
 from urllib3 import disable_warnings
 from urllib3.exceptions import InsecureRequestWarning
 
-# from tianyancha.conf.env import X_AUTH_TOKEN
+# from conf.env import X_AUTH_TOKEN
 from untils.pysql import *
 from conf.env import *
 from untils.sql_data import TYC_DATA
+from untils.urls import CHECK_LIST
 
 disable_warnings(InsecureRequestWarning)
 
 
 def get_auth(pCompanyName, pTycId, pPageNum=1):
     iVersion = "Android 12.67.0"
-    iUrl = f"https://api6.tianyancha.com/cloud-business-state/check/list?gid={pTycId}&name={pCompanyName}&pageSize=20&pageNum={pPageNum}"
+    iUrl = CHECK_LIST.format(pTycId, pCompanyName, pPageNum)
+    # iUrl = f"https://api6.tianyancha.com/cloud-business-state/check/list?gid={pTycId}&name={pCompanyName}&pageSize=20&pageNum={pPageNum}"
 
     iData = {"url": iUrl, "version": iVersion}
     iResp = requests.post("http://127.0.0.1:9966/get_authorzation", data=json.dumps(iData))
@@ -49,7 +51,8 @@ def create_json(pCompanyName, pResJson):
 
 
 def get_total_page(pCompanyName, pTycId, pPageNum=1):
-    iUrl = f"https://api6.tianyancha.com/cloud-business-state/check/list?gid={pTycId}&name={pCompanyName}&pageSize=20&pageNum={pPageNum}"
+    iUrl = CHECK_LIST.format(pTycId, pCompanyName, pPageNum)
+
     iData = get_auth(pTycId=pTycId, pPageNum=pPageNum, pCompanyName=pCompanyName)
     iTycHi = iData["data"]["tyc_hi"]
     iAuthorization = iData["data"]["Authorization"]
@@ -98,7 +101,8 @@ def get_total_page(pCompanyName, pTycId, pPageNum=1):
 
 
 def get_bond_info(pInfoId, pCompanyName, pTycId, pPageNum=1):
-    iUrl = f"https://api6.tianyancha.com/cloud-business-state/check/list?gid={pTycId}&name={pCompanyName}&pageSize=20&pageNum={pPageNum}"
+    iUrl = CHECK_LIST.format(pTycId, pCompanyName, pPageNum)
+
     iData = get_auth(pTycId=pTycId, pPageNum=pPageNum, pCompanyName=pCompanyName)
     iTycHi = iData["data"]["tyc_hi"]
     iAuthorization = iData["data"]["Authorization"]

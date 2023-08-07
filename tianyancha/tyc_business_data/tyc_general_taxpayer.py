@@ -10,21 +10,17 @@ import hashlib
 
 import requests
 import json
-from loguru import logger
 import os
-import time
 import math
 from untils.pysql import *
 
-from conf.env import *
 import uuid
 
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from untils.redis_conn import conn
-from untils.sql_data import TYC_DATA
-from untils.urls import PUBLICITY_OF_LAND_PLOtS, GENERAL_TAXPAYER
+from untils.urls import GENERAL_TAXPAYER
 
 from untils.sql_data import TYC_DATA
 

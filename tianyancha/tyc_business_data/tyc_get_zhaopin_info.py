@@ -20,6 +20,7 @@ from untils.redis_conn import conn
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from untils.sql_data import TYC_DATA
+from untils.urls import ZHAOPIN
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -41,12 +42,11 @@ def create_json(pageNum, info_id, tyc_id, company_name, res_json):
 
 def get_authoriaztion(info_id, company_name, tyc_id, pageNum):
     version = "Android 12.67.0"
-
-    url = f"https://api6.tianyancha.com/cloud-business-state/recruitment/list?city=-100&pageSize=10&graphId={tyc_id}&experience=-100&pageNum={pageNum}&startDate=-100"
+    url = ZHAOPIN.format(tyc_id, pageNum)
     data = {"url": url, "version": version}
 
     r = requests.post("http://127.0.0.1:9966/get_authorzation", data=json.dumps(data))
-    logger.warning(r.text)
+    # logger.warning(r.text)
     data = json.loads(r.text)
     return data
 
@@ -79,9 +79,8 @@ def get_Zhaopin_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid,
         "Host": "api6.tianyancha.com",
         "Accept-Encoding": "gzip",
     }
-    url = f"https://api6.tianyancha.com/cloud-business-state/recruitment/list?city=-100&pageSize=10&graphId={tyc_id}&experience=-100&pageNum=1&startDate=-100"
+    url = ZHAOPIN.format(tyc_id, 1)
     res = requests.get(url, headers=headers, verify=False).text
-    # logger.debug(res)
     res_json = json.loads(res)
     if res_json.get("state", "") == "error":
         logger.debug("%s当前数据异常" % company_name)
@@ -100,8 +99,7 @@ def get_Zhaopin_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid,
 
 def get_Zhaopin_info(pageNum, info_id, company_name, tyc_id):
     try:
-        url = f"https://api6.tianyancha.com/cloud-business-state/recruitment/list?city=-100&pageSize=10&graphId={tyc_id}&experience=-100&pageNum={pageNum}&startDate=-100"
-
+        url = ZHAOPIN.format(tyc_id, pageNum)
         data = get_authoriaztion(info_id, company_name, tyc_id, pageNum)
         tyc_hi = data["data"]["tyc_hi"]
         Authorization = data["data"]["Authorization"]
@@ -199,7 +197,6 @@ def main():
             for pageNum in range(1, int(pages_total) + 1):
                 items = get_Zhaopin_info(pageNum, info_id, company_name, tyc_id)
                 try:
-                    pass
                     for item in items:
                         mq.insert_sql("t_zx_company_zhaopin_info", item)
                         logger.info("数据 %s 插入成功" % item)

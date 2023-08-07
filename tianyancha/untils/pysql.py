@@ -7,7 +7,7 @@ import time
 
 import pymysql
 from loguru import logger
-from tianyancha.conf.env import *
+from conf.env import *
 from pymysql import IntegrityError
 
 

@@ -15,8 +15,8 @@ from loguru import logger
 import os
 import time
 import math
-from tianyancha.untils.pysql import *
-from tianyancha.untils.urls import JUDICIAL_SALE
+from untils.pysql import *
+from untils.urls import JUDICIAL_SALE
 from tyc_judicial_risk_data.tyc_distribute_task import task_distribution
 
 # 忽略requests证书警告

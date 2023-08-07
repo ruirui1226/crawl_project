@@ -20,6 +20,8 @@ from untils.pysql import *
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+from untils.urls import WECHAT_INFO
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -41,12 +43,12 @@ def create_json(company_name, res_json):
 def get_authoriaztion(info_id, company_name, tyc_id, pageNum):
     version = "Android 12.67.0"
 
-    url = f"https://api6.tianyancha.com/cloud-business-state/wechat/list?pageSize=20&graphId={tyc_id}&pageNum={pageNum}"
-
+    # url = f"https://api6.tianyancha.com/cloud-business-state/wechat/list?pageSize=20&graphId={tyc_id}&pageNum={pageNum}"
+    url = WECHAT_INFO.format(tyc_id, pageNum)
     data = {"url": url, "version": version}
 
     r = requests.post("http://127.0.0.1:9964/get_authorzation", data=json.dumps(data))
-    print(r.text)
+    # print(r.text)
     data = json.loads(r.text)
     return data
 
@@ -65,10 +67,11 @@ def get_publicWechat_page(info_id, company_name, tyc_id, tyc_hi, Authorization, 
             "content-type": "application/json",
         }
 
-        url = f"https://api6.tianyancha.com/cloud-business-state/wechat/list?pageSize=20&graphId={tyc_id}&pageNum=1"
+        # url = f"https://api6.tianyancha.com/cloud-business-state/wechat/list?pageSize=20&graphId={tyc_id}&pageNum=1"
+        url = WECHAT_INFO.format(tyc_id,1)
         res = requests.get(url=url, headers=headers, verify=False).text
 
-        logger.debug(res)
+        # logger.debug(res)
         res_json = json.loads(res)
         if "total" in str(res_json["data"]):
             pages_total = math.ceil(int(res_json["data"]["total"]) / 20)
@@ -89,7 +92,8 @@ def get_publicWechat_page(info_id, company_name, tyc_id, tyc_hi, Authorization, 
 
 def get_publicWechat_info(info_id, company_name, tyc_id, pageNum):
     try:
-        url = f"https://api6.tianyancha.com/cloud-business-state/wechat/list?pageSize=20&graphId={tyc_id}&pageNum={pageNum}"
+        # url = f"https://api6.tianyancha.com/cloud-business-state/wechat/list?pageSize=20&graphId={tyc_id}&pageNum={pageNum}"
+        url = WECHAT_INFO.format(tyc_id, pageNum)
         logger.warning(url)
 
         data = get_authoriaztion(info_id, company_name, tyc_id, pageNum)
@@ -153,7 +157,7 @@ def main():
             info_id, company_name, tyc_id, tyc_hi, Authorization, duid, deviceID, x_auth_token
         )
         if pages_total:
-            print(company_name)
+            # print(company_name)
             for pageNum in range(1, int(pages_total) + 1):
                 items = get_publicWechat_info(info_id, company_name, tyc_id, pageNum)
                 try:

@@ -13,8 +13,8 @@ from loguru import logger
 import os
 import time
 import math
-from tianyancha.untils.pysql import *
-from tianyancha.conf.env import *
+from untils.pysql import *
+from conf.env import *
 
 # from untils.redis_conn import conn
 # from untils.urls import ADMINISTRATIVE_LICENSING
@@ -23,7 +23,7 @@ import uuid
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-from tianyancha.untils.urls import ADMINISTRATIVE_LICENSING, ADMINISTRATIVE_LICENSING_DETAIL
+from untils.urls import ADMINISTRATIVE_LICENSING, ADMINISTRATIVE_LICENSING_DETAIL
 
 from untils.sql_data import TYC_DATA
 

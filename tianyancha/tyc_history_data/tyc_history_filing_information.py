@@ -13,15 +13,15 @@ from loguru import logger
 import os
 import time
 import math
-from tianyancha.untils.pysql import *
-from tianyancha.conf.env import *
+from untils.pysql import *
+from conf.env import *
 import uuid
-from tianyancha.untils.urls import HISTORY_FILING_INFORMATION
+from untils.urls import HISTORY_FILING_INFORMATION
 
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-from tianyancha.untils.pysql import MysqlPipeline
+from untils.pysql import MysqlPipeline
 
 from untils.sql_data import TYC_DATA
 

@@ -14,15 +14,15 @@ from loguru import logger
 import os
 import time
 import math
-from tianyancha.conf.env import *
-from tianyancha.untils.pysql import *
+from conf.env import *
+from untils.pysql import *
 from untils.redis_conn import conn
 
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 
-from tianyancha.untils.urls import ACTUAL_CONTROL_INFO
+from untils.urls import ACTUAL_CONTROL_INFO
 from untils.sql_data import TYC_DATA
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)

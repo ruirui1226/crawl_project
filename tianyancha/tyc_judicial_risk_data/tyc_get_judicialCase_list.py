@@ -12,7 +12,7 @@ import requests
 import json
 import urllib3
 import os, time, math
-from tianyancha.untils.pysql import *
+from untils.pysql import *
 from tyc_judicial_risk_data.tyc_distribute_task import task_distribution
 from untils.redis_conn import r
 from untils.urls import JUDICIALCASE_LIST, JUDICIALCASE_DETAILS

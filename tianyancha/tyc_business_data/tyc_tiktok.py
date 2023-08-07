@@ -23,7 +23,7 @@ import uuid
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from untils.redis_conn import conn
-from untils.urls import PUBLICITY_OF_LAND_PLOtS, GENERAL_TAXPAYER
+from untils.urls import PUBLICITY_OF_LAND_PLOtS, GENERAL_TAXPAYER, DOUYIN_LIST
 
 from untils.sql_data import TYC_DATA
 
@@ -49,9 +49,10 @@ def create_json(pageNum, info_id, tyc_id, company_name, res_json):
 
 def get_authoriaztion(info_id, company_name, tyc_id, pageNum):
     version = "Android 12.67.0"
-    url = "https://api6.tianyancha.com/cloud-business-state/livebroad/list?gid={}&pageSize=20&type=1&pageNum={}".format(
-        tyc_id, pageNum
-    )
+    # url = "https://api6.tianyancha.com/cloud-business-state/livebroad/list?gid={}&pageSize=20&type=1&pageNum={}".format(
+    #     tyc_id, pageNum
+    # )
+    url = DOUYIN_LIST.format(tyc_id, pageNum)
     data = {"url": url, "version": version}
 
     r = requests.post("http://127.0.0.1:9964/get_authorzation", data=json.dumps(data))
@@ -98,9 +99,10 @@ def get_tyc_tiktok_info(info_id, company_name, tyc_id, pageNum):
             "Accept-Encoding": "gzip",
         }
 
-        url = "https://api6.tianyancha.com/cloud-business-state/livebroad/list?gid={}&pageSize=20&type=1&pageNum={}".format(
-            tyc_id, pageNum
-        )
+        # url = "https://api6.tianyancha.com/cloud-business-state/livebroad/list?gid={}&pageSize=20&type=1&pageNum={}".format(
+        #     tyc_id, pageNum
+        # )
+        url = DOUYIN_LIST.format(tyc_id, pageNum)
         res = requests.get(url=url, headers=headers, verify=False).text
         logger.debug(res)
         res_json = json.loads(res)

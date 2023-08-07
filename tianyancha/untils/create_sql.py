@@ -7,7 +7,7 @@
 @time: 2023/5/22 
 """
 import pymysql
-from tianyancha.conf.env import *
+from conf.env import *
 from pymysql import IntegrityError
 from loguru import logger
 

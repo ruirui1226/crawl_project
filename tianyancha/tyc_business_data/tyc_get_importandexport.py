@@ -6,14 +6,7 @@
 """
 import requests
 import json
-from loguru import logger
 import os
-import time
-import math
-
-# from tyc_projects.untils.pysql import *
-
-from conf.env import *
 
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -22,6 +15,7 @@ from untils.pysql import *
 from untils.redis_conn import conn
 
 from untils.sql_data import TYC_DATA
+from untils.urls import IMPORTANDEXPORT_URL
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -44,8 +38,8 @@ def create_json(company_name, res_json):
 def get_authoriaztion(info_id, company_name, tyc_id, pageNum):
     version = "Android 12.67.0"
 
-    url = f"https://api6.tianyancha.com/cloud-business-state/import/export/credit/info?graphId={tyc_id}"
-    data = {"url": url, "version": version}
+    # url = f"https://api6.tianyancha.com/cloud-business-state/import/export/credit/info?graphId={tyc_id}"
+    data = {"url": IMPORTANDEXPORT_URL.format(tyc_id), "version": version}
 
     r = requests.post("http://127.0.0.1:9966/get_authorzation", data=json.dumps(data))
     logger.warning(r.text)
@@ -55,7 +49,8 @@ def get_authoriaztion(info_id, company_name, tyc_id, pageNum):
 
 def get_importAndExport_info(info_id, company_name, tyc_id, tyc_hi, Authorization, duid, deviceID, X_AUTH_TOKEN):
     try:
-        url = f"https://api6.tianyancha.com/cloud-business-state/import/export/credit/info?graphId={tyc_id}"
+        # url = f"https://api6.tianyancha.com/cloud-business-state/import/export/credit/info?graphId={tyc_id}"
+        url =IMPORTANDEXPORT_URL.format(tyc_id)
 
         logger.warning(url)
 

@@ -231,3 +231,39 @@ ANNOUNCEMENT_OF_TAX = (
 
 # 招投标详情
 BID_DETAIL = "https://m.tianyancha.com/app/h5/bid/{}"
+
+#招投标
+BID_URL = "https://api6.tianyancha.com/cloud-business-state/bid/listV2?area=-100&infoType=-100&pageSize=20&graphId={}&pageNum={}&pubDate=-100"
+
+#供应商
+SUPPLY_URL = "https://api6.tianyancha.com/cloud-business-state/supply/summaryList?gid={}&year=-100&pageSize=20&pageNum={}"
+
+# 产品信息
+APPBKINFO_FILE = "https://api6.tianyancha.com/cloud-business-state/v3/ar/appbkinfo?pageSize=20&id={}&pageNum={}"
+# 客户
+SUMMARY_LIST = "https://api6.tianyancha.com/cloud-business-state/client/summaryList?gid={}&pageSize=20&pageNum={}"
+# 微博
+WEIBO_LIST = "https://api6.tianyancha.com/cloud-business-state/weibo/list?pageSize=20&graphId={}&pageNum={}"
+# 抖音
+DOUYIN_LIST = "https://api6.tianyancha.com/cloud-business-state/livebroad/list?gid={}&pageSize=20&type=1&pageNum={}"
+# 微信公众号
+WECHAT_INFO = "https://api6.tianyancha.com/cloud-business-state/wechat/list?pageSize=20&graphId={}&pageNum={}"
+
+#进口出口
+IMPORTANDEXPORT_URL = "https://api6.tianyancha.com/cloud-business-state/import/export/credit/info?graphId={}"
+
+# 新闻舆情
+NEW_INFO = "https://api6.tianyancha.com/cloud-yq-news/company/detail/publicmsg/news/web.json?ps=20&emotion=-100&id={}&event=-100&type=0&pn={}"
+
+# 招聘
+ZHAOPIN = "https://api6.tianyancha.com/cloud-business-state/recruitment/list?city=-100&pageSize=10&graphId={}&experience=-100&pageNum={}&startDate=-100"
+
+# 购地信息
+PURCHASE = "https://api6.tianyancha.com/cloud-business-state/recruitment/list?city=-100&pageSize=10&graphId={}&experience=-100&pageNum={}&startDate=-100"
+
+# 购地信息详情
+PURCHASE_DETAIL = "https://api6.tianyancha.com/cloud-business-state/recruitment/list?city=-100&pageSize=10&graphId={}&experience=-100&pageNum={}&startDate=-100"
+# 标准信息
+STANDARD = "https://api6.tianyancha.com/cloud-business-state/standard/list?gid={}&pageSize=20&pageNum={}"
+# 抽查检查
+CHECK_LIST = "https://api6.tianyancha.com/cloud-business-state/check/list?gid={}&name={}&pageSize=20&pageNum={}"

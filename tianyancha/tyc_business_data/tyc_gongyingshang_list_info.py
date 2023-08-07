@@ -7,21 +7,19 @@
 @Software: PyCharm
 """
 
-import datetime
 import json
 import math
 import os
-import time
 
 import requests
 from urllib3 import disable_warnings
 from urllib3.exceptions import InsecureRequestWarning
 from untils.redis_conn import conn
 from untils.pysql import *
-from conf.env import *
 import uuid
 
 from untils.sql_data import TYC_DATA
+from untils.urls import SUPPLY_URL
 
 disable_warnings(InsecureRequestWarning)
 
@@ -29,9 +27,9 @@ disable_warnings(InsecureRequestWarning)
 def get_authoriaztion(info_id, company_name, tyc_id, pageNum):
     version = "Android 12.67.0"
 
-    url = f"https://api6.tianyancha.com/cloud-business-state/supply/summaryList?gid={tyc_id}&year=-100&pageSize=20&pageNum={pageNum}"
+    # url = f"https://api6.tianyancha.com/cloud-business-state/supply/summaryList?gid={tyc_id}&year=-100&pageSize=20&pageNum={pageNum}"
 
-    data = {"url": url, "version": version}
+    data = {"url": SUPPLY_URL.format(tyc_id, pageNum), "version": version}
 
     r = requests.post("http://127.0.0.1:9966/get_authorzation", data=json.dumps(data))
     logger.warning(r.text)
@@ -86,7 +84,8 @@ def get_supply_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid, 
             "Accept-Encoding": "gzip",
         }
 
-        url = f"https://api6.tianyancha.com/cloud-business-state/supply/summaryList?gid={tyc_id}&year=-100&pageSize=20&pageNum=1"
+        # url = f"https://api6.tianyancha.com/cloud-business-state/supply/summaryList?gid={tyc_id}&year=-100&pageSize=20&pageNum=1"
+        url = SUPPLY_URL.format(tyc_id, 1)
         res = requests.get(url, headers=headers, verify=False).text
 
         logger.debug(res)
@@ -112,7 +111,7 @@ def get_supply_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid, 
 
 def get_supply_info(info_id, company_name, tyc_id, pageNum):
     try:
-        url = f"https://api6.tianyancha.com/cloud-business-state/client/summaryList?gid={tyc_id}&pageSize=20&pageNum={pageNum}"
+        url = SUPPLY_URL.format(tyc_id, pageNum)
         logger.warning(url)
         data = get_authoriaztion(info_id, company_name, tyc_id, pageNum)
         tyc_hi = data["data"]["tyc_hi"]
@@ -149,7 +148,8 @@ def get_supply_info(info_id, company_name, tyc_id, pageNum):
             "Accept-Encoding": "gzip",
         }
 
-        url = f"https://api6.tianyancha.com/cloud-business-state/supply/summaryList?gid={tyc_id}&year=-100&pageSize=20&pageNum={pageNum}"
+        # url = f"https://api6.tianyancha.com/cloud-business-state/supply/summaryList?gid={tyc_id}&year=-100&pageSize=20&pageNum={pageNum}"
+        url = SUPPLY_URL.format(tyc_id, pageNum)
         res = requests.get(url, headers=headers, verify=False).text
 
         logger.debug(res)

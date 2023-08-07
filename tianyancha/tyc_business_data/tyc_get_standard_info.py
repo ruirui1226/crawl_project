@@ -11,13 +11,14 @@ import json
 from loguru import logger
 import os, time, math
 import uuid
-from tianyancha.conf.env import *
+from conf.env import *
 from untils.pysql import *
 
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from untils.sql_data import TYC_DATA
+from untils.urls import STANDARD
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -42,12 +43,13 @@ def create_json(pageNum, info_id, tyc_id, company_name, res_json):
 def get_authoriaztion(info_id, company_name, tyc_id, pageNum):
     version = "Android 12.67.0"
 
-    url = f"https://api6.tianyancha.com/cloud-business-state/standard/list?gid={tyc_id}&pageSize=20&pageNum={pageNum}"
+    # url = f"https://api6.tianyancha.com/cloud-business-state/standard/list?gid={tyc_id}&pageSize=20&pageNum={pageNum}"
+    url = STANDARD.format(tyc_id, pageNum)
 
     data = {"url": url, "version": version}
 
     r = requests.post("http://127.0.0.1:9966/get_authorzation", data=json.dumps(data))
-    logger.warning(r.text)
+    # logger.warning(r.text)
     data = json.loads(r.text)
     return data
 
@@ -82,7 +84,8 @@ def get_standard_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid
             "Accept-Encoding": "gzip",
         }
 
-        url = f"https://api6.tianyancha.com/cloud-business-state/standard/list?gid={tyc_id}&pageSize=20&pageNum=1"
+        url = STANDARD.format(tyc_id, 1)
+
         res = requests.get(url, headers=headers, verify=False).text
 
         logger.debug(res)
@@ -106,9 +109,7 @@ def get_standard_page(info_id, company_name, tyc_id, tyc_hi, Authorization, duid
 
 def get_standard_info(info_id, company_name, tyc_id, pageNum):
     try:
-        url = (
-            f"https://api6.tianyancha.com/cloud-business-state/standard/list?gid={tyc_id}&pageSize=20&pageNum={pageNum}"
-        )
+        url = STANDARD.format(tyc_id, pageNum)
         logger.warning(url)
         data = get_authoriaztion(info_id, company_name, tyc_id, pageNum)
         tyc_hi = data["data"]["tyc_hi"]

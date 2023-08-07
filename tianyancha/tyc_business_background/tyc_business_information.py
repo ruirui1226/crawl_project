@@ -16,13 +16,13 @@ from loguru import logger
 import os, time, math
 import uuid
 from conf.env import *
-from tianyancha.untils.pysql import *
-from tianyancha.untils.redis_conn import conn
+from untils.pysql import *
+from untils.redis_conn import conn
 
 # 忽略requests证书警告
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-from tianyancha.untils.urls import BUSINESS_INFORMATION
+from untils.urls import BUSINESS_INFORMATION
 from untils.sql_data import TYC_DATA
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)

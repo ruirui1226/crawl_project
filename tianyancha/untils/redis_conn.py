@@ -4,7 +4,7 @@
 # @ FileName  : redis_conn.py
 # @ SoftWare  : PyCharm
 from redis import Redis
-from tianyancha.conf.env import *
+from conf.env import *
 
 conn = Redis(host=REDIS_HOST, encoding=REDIS_ENCODING, port=REDIS_PORT, db=REDIS_DB)
 
